@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+
+<!-- Add a contraint : Fixed -->
+<Node name="root" dt="0.01" gravity="0 -1 0">
+
+    <Node name="plugins">
+        <RequiredPlugin name="Sofa.Component.IO.Mesh"/> <!-- Needed to use components [MeshGmshLoader] -->
+        <RequiredPlugin name="Sofa.Component.LinearSolver.Iterative"/> <!-- Needed to use components [CGLinearSolver] -->
+        <RequiredPlugin name="Sofa.Component.Mass"/> <!-- Needed to use components [MeshMatrixMass] -->
+        <RequiredPlugin name="Sofa.Component.MechanicalLoad"/> <!-- Needed to use components [ConstantForceField] -->
+        <RequiredPlugin name="Sofa.Component.StateContainer"/> <!-- Needed to use components [MechanicalObject] -->
+        <RequiredPlugin name="Sofa.Component.ODESolver.Backward"/> <!-- Needed to use components [EulerImplicitSolver] -->
+        <RequiredPlugin name="Sofa.Component.SolidMechanics.Spring"/> <!-- Needed to use components [MeshSpringForceField] -->
+        <RequiredPlugin name="Sofa.Component.Topology.Container.Dynamic"/> <!-- Needed to use components [TetrahedronSetGeometryAlgorithms, TetrahedronSetTopologyContainer] -->
+        <RequiredPlugin name="Sofa.Component.Visual"/> <!-- Needed to use components [VisualStyle] -->
+        <RequiredPlugin name="Sofa.GL.Component.Rendering3D"/> <!-- Needed to use components [OglModel] -->
+        <RequiredPlugin name="Sofa.Component.Topology.Mapping"/> <!-- Needed to use components [Tetra2TriangleTopologicalMapping] -->
+        <RequiredPlugin name="Sofa.Component.Constraint.Projective"/> <!-- Needed to use components [FixedConstraint] -->
+        <RequiredPlugin name="Sofa.Component.Mapping.Linear"/> <!-- Needed to use components [BarycentricMapping] -->
+    </Node>
+
+    <DefaultAnimationLoop />
+
+    <VisualStyle displayFlags="showWireframe showBehaviorModels showForceFields hideVisual" />
+
+    <MeshGmshLoader name="meshLoaderCoarse" filename="mesh/liver.msh" />
+    <MeshOBJLoader  name="meshLoaderFine" filename="mesh/liver-smooth.obj" />
+
+    <Node name="Liver">
+        <EulerImplicitSolver />
+        <CGLinearSolver iterations="200" tolerance="1e-09" threshold="1e-09"/>
+
+        <TetrahedronSetTopologyContainer name="topo" src="@../meshLoaderCoarse" />
+        <TetrahedronSetGeometryAlgorithms template="Vec3d" name="GeomAlgo" />
+
+        <MechanicalObject template="Vec3d" name="MechanicalModel" showObject="1" showObjectScale="5"/>
+        <MeshSpringForceField name="Springs" tetrasStiffness="10000" tetrasDamping="10" drawSpringSize="1.5" drawMode="1" drawMinElongationRange="0" drawMaxElongationRange="1" />
+
+        <MeshMatrixMass massDensity="1" topology="@topo"/>
+
+        <FixedConstraint indices="1 3 50" />
+
+        <Node name="FineVisualModel" >
+            <OglModel  name="VisualModel" src="@../../meshLoaderFine" />
+            <BarycentricMapping name="VMapping" input="@../MechanicalModel" output="@VisualModel" />
+        </Node>
+    </Node>
+</Node>
+
