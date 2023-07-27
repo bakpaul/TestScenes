@@ -1,0 +1,24 @@
+
+--- NEW SESSION: 17/07/2023 14:08:49 ---
+//Intersection.useLineLine = 1
+
+--- NEW SESSION: 17/07/2023 15:16:49 ---
+//NarrowPhase.listening = 1
+
+--- NEW SESSION: 17/07/2023 15:18:07 ---
+/Floor/VisualStyle1.displayFlags = hideAll hideOptions
+
+--- NEW SESSION: 17/07/2023 16:03:48 ---
+/Floor/VisualStyle1.displayFlags = hideAll hideOptions
+
+--- NEW SESSION: 17/07/2023 16:19:43 ---
+/Floor/VisualStyle1.displayFlags = hideAll hideOptions
+
+--- NEW SESSION: 18/07/2023 17:13:14 ---
+/FEM/mstate.showColor = 1 1 1 1
+
+--- NEW SESSION: 19/07/2023 10:00:11 ---
+/FEM/mstate.showColor = 1 1 1 1
+/FEM/mstate.showIndices = 1
+/FEM/mstate.showColor = 1 1 1 1
+/FEM/mstate.showIndicesScale = 0.01
