@@ -33,3 +33,17 @@ set(PLUGIN_SOFACUDA ON  CACHE BOOL "FORCE VALUE" FORCE)
 
 set_target_properties(SofaCUDA PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
 
+ 
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../sofa-framework/SofaCUDAUtils "Plugin/SofaCUDAUtils")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../sofa-framework/SofaAsyncSolvers "Plugin/SofaAsyncSolvers")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../sofa-framework/SofaCUDASolvers "Plugin/SofaCUDASolvers")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../sofa-framework/SofaCUDADev "Plugin/SofaCUDADev")
+
+
+set_target_properties(SofaCUDAUtils PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
+set_target_properties(SofaAsyncSolvers PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
+set_target_properties(SofaCUDASolvers PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
+set_target_properties(SofaCUDADev PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
+
+
