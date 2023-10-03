@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+
+<Node name="root" dt="0.025" gravity="0 0 0" >
+<RequiredPlugin pluginName="CGALPlugin"/>
+<RequiredPlugin pluginName="image"/>
+    <RequiredPlugin pluginName="SperryPlugin"/>
+    <RequiredPlugin pluginName="RegistrationConstraint"/>
+
+    <VisualStyle displayFlags="showVisualModels showForceFields" />
+    <BackgroundSetting color="0.8 0.8 0.8 1" />
+
+
+    <Node name="Mecha" >
+
+        <EulerImplicitSolver firstOrder="false" rayleighMass="0.1" rayleighStiffness="0.1" />
+        <CGLinearSolver iterations="10" tolerance="1e-5" preconditioner="@precond" />
+        <SparseLDLSolver name="precond" template="AsyncCompressedRowSparseMatrix3x3f" />
+        <Node name="Mesh" >
+            <MeshVTKLoader name="loader" filename="data/graph.vtk"  />
+            <TetrahedronSetTopologyContainer name="Container" src="@loader" />
+            <TetrahedronSetTopologyModifier name="Modifier"/>
+            <MechanicalObject name="mstate" template="Vec3d" />
+            <TetrahedronFEMForceField name="FEM"  youngModulus="8" poissonRatio="0.4" method="svd" />
+
+            <MeshMatrixMass totalmass="1" />
+            <Node name="Surface">
+                <VisualStyle displayFlags="hideCollisionModels" />
+
+                <MeshObjLoader name="loader" filename="data/graph.obj"/>
+                <TriangleSetTopologyContainer name="Container" src="@loader" />
+                <TriangleSetTopologyModifier name="Modifier"/>
+                <MechanicalObject name="dofs" />
+                <Node >
+                    <OglModel color="1 1 1 0.3" name="visualModel" position="@../dofs.position" triangles="@../Container.quads" />
+                    <IdentityMapping />
+                </Node>
+                <BarycentricMapping name="SurfaceMapping"/>
+            </Node>
+
+        </Node>
+        <Node name="S" >
+            <MeshVTKLoader name="loader" filename="data/S.vtk"  />
+            <TetrahedronSetTopologyContainer name="Container" src="@loader" />
+            <TetrahedronSetTopologyModifier name="Modifier"/>
+            <MechanicalObject name="mstate" template="Vec3d" />
+            <TetrahedronFEMForceField name="FEM"  youngModulus="8" poissonRatio="0.4" method="svd" />
+
+            <MeshMatrixMass totalmass="1" />
+            <Node name="Surface">
+                <VisualStyle displayFlags="hideCollisionModels" />
+
+                <MeshObjLoader name="loader" filename="data/S.obj"/>
+                <TriangleSetTopologyContainer name="Container" src="@loader" />
+                <TriangleSetTopologyModifier name="Modifier"/>
+                <MechanicalObject name="dofs" />
+                <Node >
+                    <OglModel color="1 1 1 0.3" name="visualModel" position="@../dofs.position" triangles="@../Container.quads" />
+                    <IdentityMapping />
+                </Node>
+                <BarycentricMapping name="SurfaceMapping"/>
+            </Node>
+
+        </Node>
+        <Node name="O" >
+            <MeshVTKLoader name="loader" filename="data/O.vtk"  />
+            <TetrahedronSetTopologyContainer name="Container" src="@loader" />
+            <TetrahedronSetTopologyModifier name="Modifier"/>
+            <MechanicalObject name="mstate" template="Vec3d" />
+            <TetrahedronFEMForceField name="FEM"  youngModulus="8" poissonRatio="0.4" method="svd" />
+
+            <MeshMatrixMass totalmass="1" />
+            <Node name="Surface">
+                <VisualStyle displayFlags="hideCollisionModels" />
+
+                <MeshObjLoader name="loader" filename="data/O.obj"/>
+                <TriangleSetTopologyContainer name="Container" src="@loader" />
+                <TriangleSetTopologyModifier name="Modifier"/>
+                <MechanicalObject name="dofs" />
+                <Node >
+                    <OglModel color="1 1 1 0.3" name="visualModel" position="@../dofs.position" triangles="@../Container.quads" />
+                    <IdentityMapping />
+                </Node>
+                <BarycentricMapping name="SurfaceMapping"/>
+            </Node>
+
+        </Node>
+        <Node name="F" >
+            <MeshVTKLoader name="loader" filename="data/F.vtk"  />
+            <TetrahedronSetTopologyContainer name="Container" src="@loader" />
+            <TetrahedronSetTopologyModifier name="Modifier"/>
+            <MechanicalObject name="mstate" template="Vec3d" />
+            <TetrahedronFEMForceField name="FEM"  youngModulus="8" poissonRatio="0.4" method="svd" />
+
+            <MeshMatrixMass totalmass="1" />
+            <Node name="Surface">
+                <VisualStyle displayFlags="hideCollisionModels" />
+
+                <MeshObjLoader name="loader" filename="data/F.obj"/>
+                <TriangleSetTopologyContainer name="Container" src="@loader" />
+                <TriangleSetTopologyModifier name="Modifier"/>
+                <MechanicalObject name="dofs" />
+                <Node >
+                    <OglModel color="1 1 1 0.3" name="visualModel" position="@../dofs.position" triangles="@../Container.quads" />
+                    <IdentityMapping />
+                </Node>
+                <BarycentricMapping name="SurfaceMapping"/>
+            </Node>
+
+        </Node>
+        <Node name="A" >
+            <MeshVTKLoader name="loader" filename="data/A.vtk"  />
+            <TetrahedronSetTopologyContainer name="Container" src="@loader" />
+            <TetrahedronSetTopologyModifier name="Modifier"/>
+            <MechanicalObject name="mstate" template="Vec3d" />
+            <TetrahedronFEMForceField name="FEM"  youngModulus="8" poissonRatio="0.4" method="svd" />
+
+            <MeshMatrixMass totalmass="1" />
+            <Node name="Surface">
+                <VisualStyle displayFlags="hideCollisionModels" />
+
+                <MeshObjLoader name="loader" filename="data/A.obj"/>
+                <TriangleSetTopologyContainer name="Container" src="@loader" />
+                <TriangleSetTopologyModifier name="Modifier"/>
+                <MechanicalObject name="dofs" />
+                <Node >
+                    <OglModel color="1 1 1 0.3" name="visualModel" position="@../dofs.position" triangles="@../Container.quads" />
+                    <IdentityMapping />
+                </Node>
+                <BarycentricMapping name="SurfaceMapping"/>
+            </Node>
+
+        </Node>
+    </Node >
+
+</Node >
+
