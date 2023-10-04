@@ -19,8 +19,7 @@ set(SOFA_USE_MASK OFF CACHE BOOL "FORCE VALUE" FORCE)
 set(APPLICATION_MODELER OFF CACHE BOOL "FORCE VALUE" FORCE)
 set(SOFA_BUILD_SCENECREATOR OFF CACHE BOOL "FORCE VALUE" FORCE)
 set(SOFAGUI_ENABLE_QWT OFF CACHE BOOL "FORCE VALUE" FORCE)
-set(PLUGIN_SOFAPYTHON OFF CACHE BOOL "FORCE VALUE" FORCE)
-set(PLUGIN_SOFAPYTHON3 ON CACHE BOOL "FORCE VALUE" FORCE)
+
 set(PLUGIN_IMAGE OFF CACHE BOOL "FORCE VALUE" FORCE)
 set(PLUGIN_DIFFUSIONSOLVER OFF CACHE BOOL "FORCE VALUE" FORCE)
 
@@ -31,34 +30,20 @@ set(SOFA_FETCH_REGRESSION ON CACHE BOOL "FORCE VALUE" FORCE)
 set(APPLICATION_REGRESSION_TEST ON CACHE BOOL "FORCE VALUE" FORCE)
 
 
+set(SOFA_FETCH_BEAMADAPTER ON CACHE BOOL "FORCE VALUE" FORCE)
+set(PLUGIN_BEAMADAPTER ON CACHE BOOL "FORCE VALUE" FORCE)
 
-#Personal plugins
-##### CUDA #####
-#set(SOFACUDA_CUBLAS ON  CACHE BOOL "FORCE VALUE" FORCE)
-#set(SOFACUDA_DOUBLE ON  CACHE BOOL "FORCE VALUE" FORCE)
-#set(PLUGIN_SOFACUDA ON  CACHE BOOL "FORCE VALUE" FORCE)
+set(SOFA_FETCH_SOFAPYTHON3 ON CACHE BOOL "FORCE VALUE" FORCE)
+set(PLUGIN_SOFAPYTHON3 ON CACHE BOOL "FORCE VALUE" FORCE)
+ 
+set(SOFA_FETCH_SOFTROBOTS ON CACHE BOOL "FORCE VALUE" FORCE)
+set(PLUGIN_SOFTROBOTS ON CACHE BOOL "FORCE VALUE" FORCE)
 
 
-#set_target_properties(SofaCUDA PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../consortium/SofaPython3 "Plugin/SofaPython3")
-
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../SofaDefrost/SoftRobots.Inverse "Plugin/SoftRobots.Inverse")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../SofaDefrost/STLIB "Plugin/STLIB")
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/CollisionAlgorithm "Plugin/CollisionAlgorithm")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/ConstraintGeometry "Plugin/ConstraintGeometry")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/NeedleConstraintPlugin "Plugin/NeedleConstraintPlugin")
-
-
-#[[
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../sofa-framework/SofaCUDAUtils "Plugin/SofaCUDAUtils")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../sofa-framework/SofaAsyncSolvers "Plugin/SofaAsyncSolvers")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../sofa-framework/SofaCUDASolvers "Plugin/SofaCUDASolvers")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../sofa-framework/SofaCUDADev "Plugin/SofaCUDADev")
-
-
-set_target_properties(SofaCUDAUtils PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
-set_target_properties(SofaAsyncSolvers PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
-set_target_properties(SofaCUDASolvers PROPERTIES CUDA_ARCHITECTURES "sm_8.6")
-set_target_properties(SofaCUDADev PROPERTIES CUDA_ARCHITECTURES "sm_8.6")]]
-
-

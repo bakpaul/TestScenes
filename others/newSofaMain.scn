@@ -26,7 +26,7 @@
             <Node name="Surface">
                 <VisualStyle displayFlags="hideCollisionModels" />
 
-                <MeshObjLoader name="loader" filename="data/graph.obj"/>
+                <MeshObjLoader name="loader" filename="data/graph_t.obj"/>
                 <TriangleSetTopologyContainer name="Container" src="@loader" />
                 <TriangleSetTopologyModifier name="Modifier"/>
                 <MechanicalObject name="dofs" />
@@ -49,7 +49,7 @@
             <Node name="Surface">
                 <VisualStyle displayFlags="hideCollisionModels" />
 
-                <MeshObjLoader name="loader" filename="data/S.obj"/>
+                <MeshObjLoader name="loader" filename="data/S_t.obj"/>
                 <TriangleSetTopologyContainer name="Container" src="@loader" />
                 <TriangleSetTopologyModifier name="Modifier"/>
                 <MechanicalObject name="dofs" />
@@ -72,7 +72,7 @@
             <Node name="Surface">
                 <VisualStyle displayFlags="hideCollisionModels" />
 
-                <MeshObjLoader name="loader" filename="data/O.obj"/>
+                <MeshObjLoader name="loader" filename="data/O_t.obj"/>
                 <TriangleSetTopologyContainer name="Container" src="@loader" />
                 <TriangleSetTopologyModifier name="Modifier"/>
                 <MechanicalObject name="dofs" />
@@ -95,7 +95,7 @@
             <Node name="Surface">
                 <VisualStyle displayFlags="hideCollisionModels" />
 
-                <MeshObjLoader name="loader" filename="data/F.obj"/>
+                <MeshObjLoader name="loader" filename="data/F_t.obj"/>
                 <TriangleSetTopologyContainer name="Container" src="@loader" />
                 <TriangleSetTopologyModifier name="Modifier"/>
                 <MechanicalObject name="dofs" />
@@ -118,7 +118,7 @@
             <Node name="Surface">
                 <VisualStyle displayFlags="hideCollisionModels" />
 
-                <MeshObjLoader name="loader" filename="data/A.obj"/>
+                <MeshObjLoader name="loader" filename="data/A_t.obj"/>
                 <TriangleSetTopologyContainer name="Container" src="@loader" />
                 <TriangleSetTopologyModifier name="Modifier"/>
                 <MechanicalObject name="dofs" />
