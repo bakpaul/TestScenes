@@ -19,6 +19,7 @@ set(SOFA_USE_MASK OFF CACHE BOOL "FORCE VALUE" FORCE)
 set(APPLICATION_MODELER OFF CACHE BOOL "FORCE VALUE" FORCE)
 set(SOFA_BUILD_SCENECREATOR OFF CACHE BOOL "FORCE VALUE" FORCE)
 set(SOFAGUI_ENABLE_QWT OFF CACHE BOOL "FORCE VALUE" FORCE)
+set(PLUGIN_MULTITHREADING ON CACHE BOOL "FORCE VALUE" FORCE)
 
 set(PLUGIN_IMAGE OFF CACHE BOOL "FORCE VALUE" FORCE)
 set(PLUGIN_DIFFUSIONSOLVER OFF CACHE BOOL "FORCE VALUE" FORCE)
@@ -41,8 +42,8 @@ set(PLUGIN_SOFTROBOTS ON CACHE BOOL "FORCE VALUE" FORCE)
 
 
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../SofaDefrost/SoftRobots.Inverse "Plugin/SoftRobots.Inverse")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../SofaDefrost/STLIB "Plugin/STLIB")
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../SofaDefrost/SoftRobots.Inverse "Plugin/SoftRobots.Inverse")
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../SofaDefrost/STLIB "Plugin/STLIB")
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/CollisionAlgorithm "Plugin/CollisionAlgorithm")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/ConstraintGeometry "Plugin/ConstraintGeometry")

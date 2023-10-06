@@ -10,21 +10,21 @@
     <BackgroundSetting color="0.8 0.8 0.8 1" />
 
 
-    <MeshObjLoader name="hull" filename="data/A.obj" /> <!--outputPoints outputTriangles-->
+    <MeshObjLoader name="hull" filename="data/S_t.obj" /> <!--outputPoints outputTriangles-->
     <MeshTopology src="@hull"/>
 
     <MeshGenerationFromPolyhedron name="generator"
             inputPoints="@hull.position" inputTriangles="@hull.triangles" inputQuads="@hull.quads"
-            cellSize="0.5" facetAngle="10"
-            facetSize="0.2" cellRatio="2"
-            facetApproximation="2" ordering="1"
-            perturb="false" odt="false" lloyd="true" lloyd_max_it="1"/>
+            cellSize="0.65" facetAngle="10"
+            facetSize="0.3" cellRatio="2"
+            facetApproximation="1" ordering="1"
+            perturb="false" odt="false" lloyd="true" lloyd_max_it="5"/>
 
     <Node name="Generated" >
         <TetrahedronSetTopologyContainer name="Container"  points="@../generator.outputPoints" tetras="@../generator.outputTetras"/>
 
         <MechanicalObject name="mstate" />
-        <MeshExporter name='exporterA' format='vtk' printLog='true' filename='A' exportAtEnd='true' />
+        <MeshExporter name='exporterA' format='vtk' printLog='true' filename='S' exportAtEnd='true' />
         <TetrahedronFEMForceField name="forceField" youngModulus="9e3" poissonRatio="0.45" method="svd" />
 
         <Sphere />
