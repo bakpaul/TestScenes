@@ -31,7 +31,7 @@
 
 
 
-    <FreeMotionAnimationLoop name="FreeMotionAnimationLoop" parallelODESolving="true" />
+    <FreeMotionAnimationLoop name="FreeMotionAnimationLoop" parallelODESolving="true" parallelCollisionDetectionAndFreeMotion="true"/>
     <GenericConstraintSolver maxIterations="10" tolerance="1.0e-3"/>
     <CollisionPipeline name="CollisionPipeline" />
     <ParallelBruteForceBroadPhase/>
