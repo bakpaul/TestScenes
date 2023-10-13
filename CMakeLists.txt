@@ -55,7 +55,7 @@ set_target_properties(SofaCUDA PROPERTIES CUDA_ARCHITECTURES "sm_86")
 
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../SofaDefrost/SoftRobots.Inverse "Plugin/SoftRobots.Inverse")
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../SofaDefrost/STLIB "Plugin/STLIB")
-
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/CollisionAlgorithm "Plugin/CollisionAlgorithm")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/ConstraintGeometry "Plugin/ConstraintGeometry")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/NeedleConstraintPlugin "Plugin/NeedleConstraintPlugin")
+#
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/CollisionAlgorithm "Plugin/CollisionAlgorithm")
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/ConstraintGeometry "Plugin/ConstraintGeometry")
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../hadrien/NeedleConstraintPlugin "Plugin/NeedleConstraintPlugin")

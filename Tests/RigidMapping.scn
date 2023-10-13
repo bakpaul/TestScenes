@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<Node name="root" dt="0.01" gravity="0 0 0" >
+    <RequiredPlugin name="Sofa.Component.AnimationLoop"/> <!-- Needed to use components [FreeMotionAnimationLoop] -->
+    <RequiredPlugin name="Sofa.Component.Constraint.Lagrangian.Correction"/> <!-- Needed to use components [LinearSolverConstraintCorrection] -->
+    <RequiredPlugin name="Sofa.Component.Constraint.Lagrangian.Model"/> <!-- Needed to use components [BilateralInteractionConstraint] -->
+    <RequiredPlugin name="Sofa.Component.Constraint.Lagrangian.Solver"/> <!-- Needed to use components [GenericConstraintSolver] -->
+    <RequiredPlugin name="Sofa.Component.LinearSolver.Direct"/> <!-- Needed to use components [SparseLDLSolver] -->
+    <RequiredPlugin name="Sofa.Component.Mapping.NonLinear"/> <!-- Needed to use components [RigidMapping] -->
+    <RequiredPlugin name="Sofa.Component.Mass"/> <!-- Needed to use components [UniformMass] -->
+    <RequiredPlugin name="Sofa.Component.MechanicalLoad"/> <!-- Needed to use components [ConstantForceField] -->
+    <RequiredPlugin name="Sofa.Component.ODESolver.Backward"/> <!-- Needed to use components [EulerImplicitSolver] -->
+    <RequiredPlugin name="Sofa.Component.Setting"/> <!-- Needed to use components [BackgroundSetting] -->
+    <RequiredPlugin name="Sofa.Component.StateContainer"/> <!-- Needed to use components [MechanicalObject] -->
+    <RequiredPlugin name="Sofa.Component.Visual"/> <!-- Needed to use components [VisualStyle] -->
+
+    <VisualStyle displayFlags="showVisualModels" />
+    <BackgroundSetting color="0.8 0.8 0.8 1" />
+
+    <FreeMotionAnimationLoop name="FreeMotionAnimationLoop" />
+    <GenericConstraintSolver maxIterations="10" tolerance="1.0e-3"/>
+
+    <Node name="Mesh" >
+        <EulerImplicitSolver firstOrder="false" rayleighMass="0.1" rayleighStiffness="0.1" />
+        <SparseLDLSolver name="precond" template="CompressedRowSparseMatrixd"  />
+
+        <MechanicalObject name="mstate" position="0 0 0 0 0 0 1" template="Rigid3d" />
+        <UniformMass totalMass="1"/>
+
+        <Node name="AttachPoint">
+            <MechanicalObject name="points" template="Vec3" position="0 0 0 1 0 0 0 1 0 0 0 1"  />
+            <ConstantForceField indices="1" forces="0.0 0.0 1.0" showArrowSize="0.2"/>
+            <RigidMapping />
+        </Node>
+        <LinearSolverConstraintCorrection linearSolver="@precond"/>
+    </Node>
+
+    <Node name="Mesh2" >
+        <MechanicalObject name="mstate" position="0 0 0 0 0 0 1" template="Rigid3d" />
+    </Node>
+
+    <BilateralInteractionConstraint template="Rigid3d"
+                                    object1="@Mesh/mstate"
+                                    object2="@Mesh2/mstate"
+                                    first_point="0" second_point="0" />
+</Node >
+
