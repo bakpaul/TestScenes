@@ -32,7 +32,7 @@
 
 
     <FreeMotionAnimationLoop name="FreeMotionAnimationLoop" parallelODESolving="true" parallelCollisionDetectionAndFreeMotion="true"/>
-    <GenericConstraintSolver maxIterations="10" tolerance="1.0e-3"/>
+    <GenericConstraintSolver maxIterations="10" multithreading='true' tolerance="1.0e-3"/>
     <CollisionPipeline name="CollisionPipeline" />
     <ParallelBruteForceBroadPhase/>
     <ParallelBVHNarrowPhase/>
@@ -50,7 +50,7 @@
         <TetrahedronSetTopologyContainer name="Container" src="@loader" />
         <TetrahedronSetTopologyModifier name="Modifier"/>
         <MechanicalObject name="mstate" template="Vec3d" />
-        <TetrahedronFEMForceField name="FEM"  youngModulus="200" poissonRatio="0.4" method="svd" />
+        <TetrahedronFEMForceField name="FEM"  youngModulus="200" poissonRatio="0.4" method="large" />
         <ConstantForceField totalForce="0 0 -2.5" />
 
         <MeshMatrixMass totalMass="0.1" />
@@ -181,7 +181,7 @@
         <TetrahedronSetTopologyContainer name="Container" src="@loader" />
         <TetrahedronSetTopologyModifier name="Modifier"/>
         <MechanicalObject name="mstate" template="Vec3d" />
-        <TetrahedronFEMForceField name="FEM"  youngModulus="1000" poissonRatio="0.4" method="small" />
+        <TetrahedronFEMForceField name="FEM"  youngModulus="10000" poissonRatio="0.48" method="large" />
 
         <MeshMatrixMass totalMass="0.1" />
         <Node name="Collision">
