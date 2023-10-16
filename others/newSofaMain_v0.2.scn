@@ -154,13 +154,13 @@
 
         <MeshMatrixMass totalMass="0.1" />
         <Node name="Collision">
-            <MeshOBJLoader name="loader" filename="data/O_t.obj"/>
-            <TriangleSetTopologyContainer name="Container" src="@loader"/>
+            <TriangleSetTopologyContainer name="Container" />
             <TriangleSetTopologyModifier name="Modifier"/>
+            <Tetra2TriangleTopologicalMapping input="@../Container" output="@Container" />
 
-            <MechanicalObject name="dofs" />
+            <MechanicalObject name="dofs" rest_position="@../mstate.rest_position"  />
             <TriangleCollisionModel name="Surface" proximity="0.02" />
-            <BarycentricMapping name="SurfaceMapping"/>
+            <IdentityMapping name="SurfaceMapping"/>
         </Node>
 
         <Node name="Visu">
