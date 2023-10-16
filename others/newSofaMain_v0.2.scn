@@ -150,17 +150,17 @@
         <TetrahedronSetTopologyContainer name="Container" src="@loader" />
         <TetrahedronSetTopologyModifier name="Modifier"/>
         <MechanicalObject name="mstate" template="Vec3d" />
-        <TetrahedronFEMForceField name="FEM"  youngModulus="10" poissonRatio="0.49" method="large" />
+        <TetrahedronFEMForceField name="FEM"  youngModulus="20" poissonRatio="0.49" method="large" />
 
         <MeshMatrixMass totalMass="0.1" />
         <Node name="Collision">
-            <TriangleSetTopologyContainer name="Container" />
+            <MeshOBJLoader name="loader" filename="data/O_t.obj"/>
+            <TriangleSetTopologyContainer name="Container" src="@loader"/>
             <TriangleSetTopologyModifier name="Modifier"/>
-            <Tetra2TriangleTopologicalMapping input="@../Container" output="@Container" />
 
-            <MechanicalObject name="dofs" rest_position="@../mstate.rest_position"  />
-            <TriangleCollisionModel name="Surface" proximity="0.02" />
-            <IdentityMapping name="SurfaceMapping"/>
+            <MechanicalObject name="dofs" />
+            <LineCollisionModel name="Surface"  proximity="0.02" />
+            <BarycentricMapping name="SurfaceMapping"/>
         </Node>
 
         <Node name="Visu">
@@ -215,7 +215,7 @@
             <TriangleSetTopologyModifier name="Modifier"/>
 
             <MechanicalObject name="dofs" />
-            <TriangleCollisionModel name="Surface" proximity="0.02" />
+            <SphereCollisionModel name="Surface" radius="0.01" proximity="0.01" />
             <BarycentricMapping name="SurfaceMapping"/>
         </Node>
 
