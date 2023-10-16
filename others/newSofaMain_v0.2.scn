@@ -150,7 +150,7 @@
 
         <MeshMatrixMass totalMass="0.1" />
         <Node name="Collision">
-            <MeshOBJLoader name="loader" filename="data/O_c.obj"/>
+            <MeshOBJLoader name="loader" filename="data/O_t.obj"/>
             <TriangleSetTopologyContainer name="Container" src="@loader"/>
             <TriangleSetTopologyModifier name="Modifier"/>
 
