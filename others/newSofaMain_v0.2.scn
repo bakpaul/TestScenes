@@ -81,7 +81,7 @@
 
 
     <Node name="BeamModel">
-        <VisualStyle displayFlags="showBehaviorModels showCollisionModels hideBoundingCollisionModels showForceFields" />
+        <VisualStyle displayFlags="showCollisionModels showForceFields" />
         <EulerImplicitSolver rayleighStiffness="0.1" rayleighMass="0.1"  printLog="false" />
         <SparseLUSolver name="BTD" template="CompressedRowSparseMatrixd" verbose="0" />
 
