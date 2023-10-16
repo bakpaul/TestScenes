@@ -190,6 +190,9 @@
             <Tetra2TriangleTopologicalMapping input="@../Container" output="@Container" />
 
             <MechanicalObject name="dofs" rest_position="@../mstate.rest_position"  />
+
+            <MeshExporter name="Exporter" exportAtEnd="true" filename="FSurf" format="obj" />
+
             <TriangleCollisionModel name="Surface" proximity="0.02" />
             <IdentityMapping name="SurfaceMapping"/>
         </Node>
