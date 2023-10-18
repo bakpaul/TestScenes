@@ -43,10 +43,10 @@
 
     <Node name="Mesh" >
         <EulerImplicitSolver firstOrder="false" rayleighMass="0.1" rayleighStiffness="0.1" />
-        <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="true"/>
+        <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="false"/>
         <SparseLDLSolver name="precond" template="CompressedRowSparseMatrixd"  parallelInverseProduct="true"  linearSystem="@A"/>
 
-        <MeshVTKLoader name="loader" filename="data/graph.vtk"  />
+        <MeshVTKLoader name="loader" filename="../Data/graph.vtk"  />
         <TetrahedronSetTopologyContainer name="Container" src="@loader" />
         <TetrahedronSetTopologyModifier name="Modifier"/>
         <MechanicalObject name="mstate" template="Vec3d" />
@@ -65,7 +65,7 @@
         </Node>
 
         <Node name="Visu">
-            <MeshOBJLoader name="loader" filename="data/graph_t.obj"/>
+            <MeshOBJLoader name="loader" filename="../Data/graph_t.obj"/>
             <OglModel color="0.7 .35 0 0.8" name="visualModel" position="@loader.position" triangles="@loader.triangles" />
             <BarycentricMapping isMechanical="false" />
         </Node>
@@ -83,7 +83,7 @@
     <Node name="BeamModel">
         <VisualStyle displayFlags="showCollisionModels showForceFields" />
         <EulerImplicitSolver rayleighStiffness="0.1" rayleighMass="0.1"  printLog="false" />
-        <SparseLUSolver name="BTD" template="CompressedRowSparseMatrixd" verbose="0" />
+        <SparseLUSolver name="BTD" template="CompressedRowSparseMatrixd" />
 
         <MechanicalObject template="Rigid3d" name="DOFs" position="12 0 -9  0.707 0 0.707 0   12 0 -8  0.707 0 0.707 0    12 0 -7  0.707 0 0.707 0    12 0 -6  0.707 0 0.707 0   12 0 -5.5  0.707 0 0.707 0"/>
         <MeshTopology name="lines" lines="0 1 1 2 2 3 3 4 " />
@@ -102,10 +102,10 @@
 
     <Node name="S" >
         <EulerImplicitSolver firstOrder="false" rayleighMass="0.1" rayleighStiffness="0.1" />
-        <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="true"/>
+        <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="false"/>
         <SparseLDLSolver name="precond" template="CompressedRowSparseMatrixd" parallelInverseProduct="true" linearSystem="@A"/>
 
-        <MeshVTKLoader name="loader" filename="data/S.vtk"  />
+        <MeshVTKLoader name="loader" filename="../Data/S.vtk"  />
         <TetrahedronSetTopologyContainer name="Container" src="@loader" />
         <TetrahedronSetTopologyModifier name="Modifier"/>
         <MechanicalObject name="mstate" template="Vec3d" />
@@ -123,7 +123,7 @@
         </Node>
 
         <Node name="Visu">
-            <MeshOBJLoader name="loader" filename="data/S_t.obj"/>
+            <MeshOBJLoader name="loader" filename="../Data/S_t.obj"/>
             <OglModel color="0.7 0.7 0.7 0.8" name="visualModel" position="@loader.position" triangles="@loader.triangles" />
             <BarycentricMapping isMechanical="false" />
         </Node>
@@ -142,11 +142,11 @@
 
     <Node name="O" >
         <EulerImplicitSolver firstOrder="false" rayleighMass="0.1" rayleighStiffness="0.1" />
-        <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="true"/>
+        <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="false"/>
         <SparseLDLSolver name="precond" template="CompressedRowSparseMatrixd"  parallelInverseProduct="true"  linearSystem="@A"/>
 
 
-        <MeshVTKLoader name="loader" filename="data/O.vtk"  />
+        <MeshVTKLoader name="loader" filename="../Data/O.vtk"  />
         <TetrahedronSetTopologyContainer name="Container" src="@loader" />
         <TetrahedronSetTopologyModifier name="Modifier"/>
         <MechanicalObject name="mstate" template="Vec3d" />
@@ -154,7 +154,7 @@
 
         <MeshMatrixMass totalMass="0.1" />
         <Node name="Collision">
-            <MeshOBJLoader name="loader" filename="data/O_t.obj"/>
+            <MeshOBJLoader name="loader" filename="../Data/O_t.obj"/>
             <TriangleSetTopologyContainer name="Container" src="@loader"/>
             <TriangleSetTopologyModifier name="Modifier"/>
 
@@ -164,7 +164,7 @@
         </Node>
 
         <Node name="Visu">
-            <MeshOBJLoader name="loader" filename="data/O_t.obj"/>
+            <MeshOBJLoader name="loader" filename="../Data/O_t.obj"/>
             <OglModel color="0.7 0.7 0.7 0.8" name="visualModel" position="@loader.position" triangles="@loader.triangles" />
             <BarycentricMapping isMechanical="false" />
         </Node>
@@ -179,7 +179,7 @@
         <UniformMass totalMass="0.1" />
 
         <Node name="Collision">
-            <MeshOBJLoader name="loader" filename="data/F_t.obj"/>
+            <MeshOBJLoader name="loader" filename="../Data/F_t.obj"/>
             <TriangleSetTopologyContainer name="Container" src="@loader"/>
             <TriangleSetTopologyModifier name="Modifier"/>
 
@@ -189,7 +189,7 @@
         </Node>
 
         <Node name="Visu">
-            <MeshOBJLoader name="loader" filename="data/F_t.obj"/>
+            <MeshOBJLoader name="loader" filename="../Data/F_t.obj"/>
             <OglModel color="0.7 0.7 0.7 0.8" name="visualModel" position="@loader.position" triangles="@loader.triangles" />
             <RigidMapping name="SurfaceMapping" globalToLocalCoords="true"/>
         </Node>
@@ -198,11 +198,11 @@
 
     <Node name="A" >
         <EulerImplicitSolver firstOrder="false" rayleighMass="0.1" rayleighStiffness="0.1" />
-        <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="true"/>
+        <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="false"/>
         <SparseLDLSolver name="precond" template="CompressedRowSparseMatrixd"  parallelInverseProduct="true"  linearSystem="@A"/>
 
 
-        <MeshVTKLoader name="loader" filename="data/A.vtk"  />
+        <MeshVTKLoader name="loader" filename="../Data/A.vtk"  />
         <TetrahedronSetTopologyContainer name="Container" src="@loader" />
         <TetrahedronSetTopologyModifier name="Modifier"/>
         <MechanicalObject name="mstate" template="Vec3d" />
@@ -210,7 +210,7 @@
 
         <MeshMatrixMass totalMass="0.1" />
         <Node name="Collision">
-            <MeshOBJLoader name="loader" filename="data/A_t.obj"/>
+            <MeshOBJLoader name="loader" filename="../Data/A_t.obj"/>
             <TriangleSetTopologyContainer name="Container" src="@loader"/>
             <TriangleSetTopologyModifier name="Modifier"/>
 
@@ -220,7 +220,7 @@
         </Node>
 
         <Node name="Visu">
-            <MeshOBJLoader name="loader" filename="data/A_t.obj"/>
+            <MeshOBJLoader name="loader" filename="../Data/A_t.obj"/>
             <OglModel color="0.7 0.7 0.7 0.8" name="visualModel" position="@loader.position" triangles="@loader.triangles" />
             <BarycentricMapping isMechanical="false" />
         </Node>
