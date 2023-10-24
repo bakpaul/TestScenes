@@ -44,7 +44,7 @@
     <Node name="Mesh" >
         <EulerImplicitSolver firstOrder="false" rayleighMass="0.1" rayleighStiffness="0.1" />
         <ConstantSparsityPatternSystem template="CompressedRowSparseMatrixd" name="A" printLog="false"/>
-        <SparseLDLSolver name="precond" template="CompressedRowSparseMatrixd"  parallelInverseProduct="true"  linearSystem="@A"/>
+        <EigenSimplicialLDLT name="precond" template="CompressedRowSparseMatrixd"  parallelInverseProduct="true"  linearSystem="@A"/>
 
         <MeshVTKLoader name="loader" filename="../Data/graph.vtk"  />
         <TetrahedronSetTopologyContainer name="Container" src="@loader" />
