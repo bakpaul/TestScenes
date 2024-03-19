@@ -7,6 +7,7 @@ def createScene(rootNode):
                        displayFlags='showVisualModels showBehaviorModels showCollisionModels '
                                     'hideBoundingCollisionModels hideForceFields '
                                     'showInteractionForceFields hideWireframe')
+    rootNode.addObject('AttachBodyButtonSetting',stiffness=1)
 
     rootNode.addObject('FreeMotionAnimationLoop')
     rootNode.addObject('QPInverseProblemSolver')

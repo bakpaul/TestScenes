@@ -7,6 +7,7 @@ def createScene(rootNode):
                        displayFlags='showVisualModels showBehaviorModels showCollisionModels '
                                     'hideBoundingCollisionModels hideForceFields '
                                     'showInteractionForceFields hideWireframe')
+    rootNode.addObject('AttachBodyButtonSetting',stiffness=1)
 
     rootNode.addObject('FreeMotionAnimationLoop')                                    ##--> Required for lagrangian constraints
     rootNode.addObject('GenericConstraintSolver')                                    ##--> Solver that will compute the lagrangian multiplier value
