@@ -30,7 +30,7 @@ def createScene(rootNode):
     model.addObject('BoxROI', name='boxROI', box=[-10, 0, -20, 0, 30, 20], drawBoxes=True,
                     position=model.MechanicalObject.position.linkpath,
                     tetrahedra=model.container.tetrahedra.linkpath)                  ##--> Define a region of interest. Here it select the fixed points 
-    model.addObject('RestShapeSpringsForceField', points=model.boxROI.indices.linkpath, stiffness=1e12) ##--> Add springs to atttach those fixed points
+    model.addObject('FixedLagrangianConstraint', indices=model.boxROI.indices.linkpath) ##--> Add springs to atttach those fixed points
     model.addObject('LinearSolverConstraintCorrection')                              ##--> Define the way the Schur complement is computed
 
 
