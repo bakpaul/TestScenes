@@ -31,7 +31,7 @@ def createScene(rootNode):
                                        elemType=ElementType.TETRA,
                                        collisionType=CollisionType.LAGRANGIAN,
                                        topologyParams=TopologyParameters(filename="../Data/graph.vtk"),
-                                       linearSolverParams=DirectLinearSolverParameters(constantSparsity=True,template="CompressedRowSparseMatrixd"))
+                                       linearSolverParams=DirectLinearSolverParameters(constantSparsity=True,parallelInverseProduct=True,template="CompressedRowSparseMatrixd"))
 
     Logo.addConstitutiveModel(law=ConstitutiveLaw.LINEAR_COROT,
                               lawParams=LinearConstitutiveLawParameters(youngModulus="200", poissonRatio="0.4", method="large"),
@@ -65,7 +65,7 @@ def createScene(rootNode):
                                     elemType=ElementType.TETRA,
                                     collisionType=CollisionType.LAGRANGIAN,
                                     topologyParams=TopologyParameters(filename="../Data/S.vtk"),
-                                    linearSolverParams=DirectLinearSolverParameters(constantSparsity=True,template="CompressedRowSparseMatrixd"))
+                                    linearSolverParams=DirectLinearSolverParameters(constantSparsity=True,parallelInverseProduct=True,template="CompressedRowSparseMatrixd"))
 
     S.addConstitutiveModel(law=ConstitutiveLaw.LINEAR_COROT,
                            lawParams=LinearConstitutiveLawParameters(youngModulus="200", poissonRatio="0.45", method="large"),
@@ -87,7 +87,7 @@ def createScene(rootNode):
                                     collisionType=CollisionType.LAGRANGIAN,
                                     topologyParams=TopologyParameters(filename="../Data/O_t.obj",generateSparseGrid=True,sparseGridSize="4 2 4"),
                                     SparseGrid={"nbVirtualFinerLevels":"2", "finestConnectivity":"0"},
-                                    linearSolverParams=DirectLinearSolverParameters(constantSparsity=True,template="CompressedRowSparseMatrixd"))
+                                    linearSolverParams=DirectLinearSolverParameters(constantSparsity=True,parallelInverseProduct=True,template="CompressedRowSparseMatrixd"))
 
     O.addConstitutiveModel(law=ConstitutiveLaw.LINEAR_COROT,
                            lawParams=LinearConstitutiveLawParameters(youngModulus="200", poissonRatio="0.45", method="large"),
@@ -116,7 +116,7 @@ def createScene(rootNode):
                                     elemType=ElementType.TETRA,
                                     collisionType=CollisionType.LAGRANGIAN,
                                     topologyParams=TopologyParameters(filename="../Data/A.vtk"),
-                                    linearSolverParams=DirectLinearSolverParameters(constantSparsity=True,template="CompressedRowSparseMatrixd"))
+                                    linearSolverParams=DirectLinearSolverParameters(constantSparsity=True,parallelInverseProduct=True,template="CompressedRowSparseMatrixd"))
 
     A.addConstitutiveModel(law=ConstitutiveLaw.LINEAR_COROT,
                            lawParams=LinearConstitutiveLawParameters(youngModulus="30", poissonRatio="0.4", method="large"),
