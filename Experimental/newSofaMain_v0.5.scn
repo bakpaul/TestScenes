@@ -19,18 +19,18 @@
 
     <!-- Define Mouse left click as a Bilateral Lagrangian constraint -->
     <!-- TODO -->
-    <!-- <ConstraintAttachButtonSetting /> in #4601 -->
+    <ConstraintAttachButtonSetting /> <!-- The presence of this component sets the mouse interaction to Lagrangian-based constraints at the GUI launch -->
 
     <!-- Header of the simulation -->
     <FreeMotionAnimationLoop name="FreeMotionAnimationLoop" parallelODESolving="true" parallelCollisionDetectionAndFreeMotion="true"/>
-    <GenericConstraintSolver maxIterations="10" multithreading='true' tolerance="1.0e-3"/>
+    <GenericConstraintSolver maxIterations="20" multithreading='true' tolerance="1.0e-4"/>
 
     <!-- Definition of the collision pipeline -->
     <CollisionPipeline name="CollisionPipeline" />
     <ParallelBruteForceBroadPhase name="CollisionBroadPhase"/>
     <ParallelBVHNarrowPhase name="CollisionNarrowPhase"/>
     <CollisionResponse name="CollisionResponse" response="FrictionContactConstraint" responseParams="mu=0.5" />
-    <NewProximityIntersection name="Intersection" alarmDistance="0.2" contactDistance="0.02" />
+    <NewProximityIntersection name="Intersection" alarmDistance="0.3" contactDistance="0.02" />
 
 
     <!-- Object = SOFA Logo -->
