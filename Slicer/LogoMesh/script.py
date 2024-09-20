@@ -93,8 +93,11 @@ for edge in sortedBorderEdges:
 
 
 mesh.cells[1].data = np.concatenate((frontTriangles,backTriangles,np.array(widthTriangles)))
+mesh.cells[0] = mesh.cells[1]
+mesh.cells.pop(2)
+mesh.cells.pop(1)
 
-
+print(mesh)
 
 #2D mesh algorithm (
 # 1: MeshAdapt, 
@@ -107,7 +110,7 @@ mesh.cells[1].data = np.concatenate((frontTriangles,backTriangles,np.array(width
 # 9: Packing of Parallelograms, 
 # 11: Quasi-structured Quad)
 
-mesh.write("test.vtk")
+mesh.write("test.obj")
 
 
 mpl.plot(Pts_x,Pts_y,'b-')
