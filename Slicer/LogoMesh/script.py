@@ -3,27 +3,29 @@ import matplotlib.pyplot as mpl
 import pygmsh
 import numpy as np
 import utils
+import sys
+sys.setrecursionlimit(1500)
 
 
 # Slicer
-splineNbPts = 30
-minDist = 6
-maxDist = 13
-iter = 30
-meshScale = 0.3
-mesh_size = 10
-width = 5
-filename = 'Slicer_LOGO.svg'
-
-#SOFA 
-# splineNbPts = 3
+# splineNbPts = 30
 # minDist = 6
 # maxDist = 13
 # iter = 30
+# meshScale = 0.3
 # mesh_size = 10
-# meshScale = 1
-# width = 5
-# filename = 'SOFA_LOGO.svg'
+# width = 10
+# filename = 'Slicer_LOGO.svg'
+# 
+#SOFA 
+splineNbPts = 3
+minDist = 6
+maxDist = 13
+iter = 30
+mesh_size = 10
+meshScale = 1
+width = 10
+filename = 'SOFA_LOGO.svg'
 
 
 paths, attributes = svg2paths(filename)
@@ -97,6 +99,10 @@ mesh.cells[0] = mesh.cells[1]
 mesh.cells.pop(2)
 mesh.cells.pop(1)
 
+mesh.cells[0].data = utils.filterDuplicatedTriangles(mesh.cells[0].data)
+utils.triangulateMesh(mesh.cells[0].data ,startId=0)
+
+print(utils.IsMeshTriangulated(mesh.cells[0].data))
 print(mesh)
 
 #2D mesh algorithm (
@@ -110,7 +116,7 @@ print(mesh)
 # 9: Packing of Parallelograms, 
 # 11: Quasi-structured Quad)
 
-mesh.write("test.obj")
+mesh.write("SOFA_surface.obj")
 
 
 mpl.plot(Pts_x,Pts_y,'b-')

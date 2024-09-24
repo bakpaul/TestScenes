@@ -21,18 +21,30 @@
 
     <MeshTopology src="@hull"/>
 
+    <!-- <Node name="Loaded" >
+        <TriangleSetTopologyContainer name="Container"  points="@../hull.position" triangles="@../hull.triangles"/>
+
+        <MechanicalObject name="mstate" />
+
+        <Node >
+            <OglModel color="1 0 0.2 1" name="visualModel" position="@../mstate.position" triangles="@../Container.triangles" />
+            <IdentityMapping />
+        </Node>
+
+    </Node> -->
+
     <MeshGenerationFromPolyhedron name="generator"
             inputPoints="@hull.position" inputTriangles="@hull.triangles" inputQuads="@hull.quads"
-            cellSize="0.65" facetAngle="10"
-            facetSize="0.3" cellRatio="2"
+            cellSize="20" facetAngle="10"
+            facetSize="10" cellRatio="2"
             facetApproximation="1" ordering="1"
-            perturb="false" odt="false" lloyd="true" lloyd_max_it="5"/>
+            perturb="false" odt="false" lloyd="true" lloyd_max_it="5"/> 
 
-    <Node name="Generated" >
+     <Node name="Generated" >
         <TetrahedronSetTopologyContainer name="Container"  points="@../generator.outputPoints" tetras="@../generator.outputTetras"/>
 
         <MechanicalObject name="mstate" />
-        <MeshExporter name='exporterA' format='vtk' printLog='true' filename='Sofa_volume' exportAtEnd='true' />
+        <MeshExporter name='exporterA' format='vtk' printLog='true' filename='Slicer_volume' exportAtEnd='true' />
         <TetrahedronFEMForceField name="forceField" youngModulus="9e3" poissonRatio="0.45" method="svd" />
 
         <Node name="Surface">
