@@ -8,24 +8,26 @@ sys.setrecursionlimit(1500)
 
 
 # Slicer
-# splineNbPts = 30
-# minDist = 6
-# maxDist = 13
-# iter = 30
-# meshScale = 0.3
-# mesh_size = 10
-# width = 10
-# filename = 'Slicer_LOGO.svg'
-# 
-#SOFA 
-splineNbPts = 3
-minDist = 6
-maxDist = 13
+splineNbPts = 15
+minDist = 9
+maxDist = 18.1
 iter = 30
-mesh_size = 10
-meshScale = 1
+meshScale = 0.3
+mesh_size = 40
 width = 10
-filename = 'SOFA_LOGO.svg'
+filename = 'Slicer_LOGO.svg'
+out_filename = 'Slicer_collision.obj'
+
+#SOFA 
+# splineNbPts = 3
+# minDist = 7
+# maxDist = 15
+# iter = 30
+# mesh_size = 20
+# meshScale = 1
+# width = 10
+# filename = 'SOFA_LOGO.svg'
+# out_filename = 'SOFA_collision.obj'
 
 
 paths, attributes = svg2paths(filename)
@@ -61,11 +63,25 @@ for pt in FilteredPts:
     FilteredPts_x.append(pt[0])
     FilteredPts_y.append(pt[1])
 
+print("Bary : " + str([np.mean(FilteredPts_x),np.mean(FilteredPts_y)]))
+
 
 with pygmsh.geo.Geometry() as geom:
     geom.add_polygon(FilteredPts, mesh_size=mesh_size)
     # mesh = geom.generate_mesh()
-    mesh = geom.generate_mesh(dim=3,order=1,algorithm=5)
+    mesh = geom.generate_mesh(dim=3,order=1,algorithm=6)
+
+
+#2D mesh algorithm (
+# 1: MeshAdapt, 
+# 2: Automatic, 
+# 3: Initial mesh only, 
+# 5: Delaunay, 
+# 6: Frontal-Delaunay, 
+# 7: BAMG, 
+# 8: Frontal-Delaunay for Quads, 
+# 9: Packing of Parallelograms, 
+# 11: Quasi-structured Quad)
 
 meshNbPoints = len(mesh.points)
 
@@ -105,18 +121,8 @@ utils.triangulateMesh(mesh.cells[0].data ,startId=0)
 print(utils.IsMeshTriangulated(mesh.cells[0].data))
 print(mesh)
 
-#2D mesh algorithm (
-# 1: MeshAdapt, 
-# 2: Automatic, 
-# 3: Initial mesh only, 
-# 5: Delaunay, 
-# 6: Frontal-Delaunay, 
-# 7: BAMG, 
-# 8: Frontal-Delaunay for Quads, 
-# 9: Packing of Parallelograms, 
-# 11: Quasi-structured Quad)
 
-mesh.write("SOFA_surface.obj")
+mesh.write(out_filename)
 
 
 mpl.plot(Pts_x,Pts_y,'b-')
