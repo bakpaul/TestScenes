@@ -20,15 +20,13 @@ def createScene(root):
                                                "Sofa.Component.Collision.Detection.Intersection", "Sofa.Component.Collision.Geometry", "Sofa.Component.Collision.Response.Contact",
                                                "Sofa.Component.Constraint.Lagrangian.Solver", "Sofa.Component.Constraint.Lagrangian.Correction", "Sofa.Component.LinearSystem",
                                                "Sofa.Component.MechanicalLoad", "MultiThreading", "Sofa.Component.SolidMechanics.Spring", "Sofa.Component.Constraint.Lagrangian.Model",
-                                               "Sofa.Component.Mapping.NonLinear", "Sofa.Component.Topology.Container.Constant", "Sofa.Component.Topology.Mapping", "CSparseSolvers",
-                                               "Sofa.Component.Topology.Container.Grid", "Sofa.Component.Engine.Select"])
+                                               "Sofa.Component.Mapping.NonLinear", "Sofa.Component.Topology.Container.Constant", "Sofa.Component.Topology.Mapping",
+                                               "Sofa.Component.Topology.Container.Grid", "Sofa.Component.Engine.Select", "Sofa.Component.Constraint.Projective"])
 
     # Rendering settings
     root.addObject("VisualStyle", name="RenderingOptions", displayFlags="showVisualModels" )
     root.addObject("BackgroundSetting", color="0.8 0.8 0.8 1" )
 
-    # The presence of this component sets the mouse interaction to Lagrangian-based constraints at the GUI launch
-    root.addObject("ConstraintAttachButtonSetting" )
 
     # Header of the simulation
     root.addObject("FreeMotionAnimationLoop", name="FreeMotionAnimationLoop", parallelODESolving="true", parallelCollisionDetectionAndFreeMotion="true")
@@ -119,7 +117,7 @@ def createScene(root):
 
     CollisionBox = root.addChild("Box")
     CollisionBox.addObject("EulerImplicitSolver", name="EulerImplicitScheme" )
-    CollisionBox.addObject("SparseLUSolver", name="LUSolver")
+    CollisionBox.addObject("EigenSparseLU", name="LUSolver", template="CompressedRowSparseMatrixd")
     CollisionBox.addObject("MechanicalObject",name="mstate", template="Rigid3", position="0 0 0 0 0 0 1")
     CollisionBox.addObject("LinearVelocityProjectiveConstraint",indices="0",keyTimes="0 2", velocities="0 0 0 0 0 0 0 0 0 0 0 0.3 ",continueAfterEnd=True)
     CollisionBox.addObject("UniformMass", name="Mass", totalMass="0.1" )
