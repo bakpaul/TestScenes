@@ -88,7 +88,7 @@ def createScene(root):
     SLICERLogo.addObject("TetrahedronSetTopologyModifier", name="Modifier",)
     SLICERLogo.addObject("MechanicalObject", name="LogoDOF", template="Vec3d" )
     SLICERLogo.addObject("TetrahedronFEMForceField", name="LinearElasticityFEM",  youngModulus="1", poissonRatio="0.3", method="large" )
-    SLICERLogo.addObject("MeshMatrixMass", name="Mass", totalMass="0.01" )
+    SLICERLogo.addObject("MeshMatrixMass", name="Mass", totalMass="0.05" )
 
     SLICERCollision = SLICERLogo.addChild("Collision")
     SLICERCollision.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/Slicer_collision_no_face.obj")
