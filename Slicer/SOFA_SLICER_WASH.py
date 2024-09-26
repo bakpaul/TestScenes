@@ -55,19 +55,21 @@ def createScene(root):
     SOFALogo.addObject("TetrahedronFEMForceField", name="LinearElasticityFEM",  youngModulus="5", poissonRatio="0.3", method="large" )
     SOFALogo.addObject("MeshMatrixMass", name="Mass", totalMass="0.1" )
 
-    # SOFACollision = SOFALogo.addChild("Collision")
-    # SOFACollision.addObject("SphereLoader", name="SphereLoader", filename="../Data/Logo.sph" )
-    # SOFACollision.addObject("MechanicalObject", name="CollisionDOF", position="@SphereLoader.position" )
-    # SOFACollision.addObject("SphereCollisionModel", name="CollisionModel", listRadius="@SphereLoader.listRadius")
-    # SOFACollision.addObject("BarycentricMapping", name="MappingCollision", input="@../LogoDOF", output="@CollisionDOF")
-
     SOFACollision = SOFALogo.addChild("Collision")
-    SOFACollision.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/SOFA_collision_fine.obj", translation="-120 20 0",rotation="180 0 90")
+    SOFACollision.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/SOFA_collision_no_face.obj", translation="-120 20 0",rotation="180 0 90")
     SOFACollision.addObject("MeshTopology", name="CollisionTopo", src="@SurfaceLoader")
     SOFACollision.addObject("MechanicalObject", name="CollisionDOF", src="@CollisionTopo" )
-    SOFACollision.addObject("LineCollisionModel", selfCollision="1", topology="@CollisionTopo")
-    # SOFACollision.addObject("TriangleCollisionModel", selfCollision="0", topology="@CollisionTopo")
+    SOFACollision.addObject("LineCollisionModel", selfCollision="1", topology="@CollisionTopo",group=[2, 3, 5])
     SOFACollision.addObject("BarycentricMapping", name="MappingCollision", input="@../LogoDOF", output="@CollisionDOF")
+
+
+    SOFACollisionBorder = SOFALogo.addChild("BorderCollision")
+    SOFACollisionBorder.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/SOFA_collision_center.obj", translation="-120 20 0",rotation="180 0 90")
+    SOFACollisionBorder.addObject("MeshTopology", name="CollisionTopo", src="@SurfaceLoader")
+    SOFACollisionBorder.addObject("MechanicalObject", name="CollisionDOF", src="@CollisionTopo" )
+    SOFACollisionBorder.addObject("LineCollisionModel", selfCollision="1", topology="@CollisionTopo",group=[3, 4 ])
+    SOFACollisionBorder.addObject("BarycentricMapping", name="MappingCollision", input="@../LogoDOF", output="@CollisionDOF")
+
 
 
     SOFAVisu = SOFALogo.addChild("Visu")
@@ -87,15 +89,23 @@ def createScene(root):
     SLICERLogo.addObject("TetrahedronSetTopologyContainer", name="Container", src="@LogoLoader" )
     SLICERLogo.addObject("TetrahedronSetTopologyModifier", name="Modifier",)
     SLICERLogo.addObject("MechanicalObject", name="LogoDOF", template="Vec3d" )
-    SLICERLogo.addObject("TetrahedronFEMForceField", name="LinearElasticityFEM",  youngModulus="0.2", poissonRatio="0.3", method="large" )
+    SLICERLogo.addObject("TetrahedronFEMForceField", name="LinearElasticityFEM",  youngModulus="1", poissonRatio="0.3", method="large" )
     SLICERLogo.addObject("MeshMatrixMass", name="Mass", totalMass="0.01" )
 
     SLICERCollision = SLICERLogo.addChild("Collision")
-    SLICERCollision.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/Slicer_collision.obj")
+    SLICERCollision.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/Slicer_collision_no_face.obj")
     SLICERCollision.addObject("MeshTopology", name="CollisionTopo", src="@SurfaceLoader")
     SLICERCollision.addObject("MechanicalObject", name="CollisionDOF", src="@CollisionTopo" )
-    SLICERCollision.addObject("LineCollisionModel", selfCollision="0", topology="@CollisionTopo")
+    SLICERCollision.addObject("LineCollisionModel", selfCollision="0", topology="@CollisionTopo",group=[1, 4, 6])
     SLICERCollision.addObject("BarycentricMapping", name="MappingCollision", input="@../LogoDOF", output="@CollisionDOF")
+
+
+    SLICERCollisionBorder = SLICERLogo.addChild("CollisionBorder")
+    SLICERCollisionBorder.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/Slicer_collision_center.obj")
+    SLICERCollisionBorder.addObject("MeshTopology", name="CollisionTopo", src="@SurfaceLoader")
+    SLICERCollisionBorder.addObject("MechanicalObject", name="CollisionDOF", src="@CollisionTopo" )
+    SLICERCollisionBorder.addObject("LineCollisionModel", selfCollision="0", topology="@CollisionTopo",group=[5, 6])
+    SLICERCollisionBorder.addObject("BarycentricMapping", name="MappingCollision", input="@../LogoDOF", output="@CollisionDOF")
 
 
     SLICERVisu = SLICERLogo.addChild("Visu")
@@ -115,11 +125,10 @@ def createScene(root):
     CollisionBox.addObject("UniformMass", name="Mass", totalMass="0.1" )
 
     CollisionBoxCollision = CollisionBox.addChild("Collision")
-    CollisionBoxCollision.addObject("TriangleSetTopologyContainer",name="FloorTopology", position="-200 -200 30    200 -200 30   200 200 30   -200 200 30   -200 -200 -30   200 -200 -30   200 200 -30   -200 200 -30",
+    CollisionBoxCollision.addObject("TriangleSetTopologyContainer",name="FloorTopology", position="-200 -200 15    200 -200 15   200 200 15   -200 200 15   -200 -200 -15   200 -200 -15   200 200 -15   -200 200 -15",
                                     triangles="0 2 1  0 3 2   4 6 5  4 7 6   0 1 4  5 4 1   3 6 2  3 7 6   1 2 6  1 6 5  0 4 3  3 4 7")
     CollisionBoxCollision.addObject("MechanicalObject",name="CollisionDOF", template="Vec3")
-    # CollisionBoxCollision.addObject("LineCollisionModel", selfCollision="0", topology="@FloorTopology",simulated="0"  )
-    CollisionBoxCollision.addObject("TriangleCollisionModel", selfCollision="0", topology="@FloorTopology",simulated="0"  )
+    CollisionBoxCollision.addObject("TriangleCollisionModel", selfCollision="0", topology="@FloorTopology",simulated="0",group=[1, 2],proximity="3" )
 
     CollisionBoxCollisionVisu = CollisionBoxCollision.addChild("Visu")
     CollisionBoxCollisionVisu.addObject("OglModel", name="VisualModel", color="0.5 0.5 0.5 0.2", src="@../FloorTopology" )

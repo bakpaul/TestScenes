@@ -225,3 +225,15 @@ def IsMeshTriangulated(mesh):
         id += 1
                 
     return True
+
+
+def writeOBJ(filename, position,edges,triangles=[]):
+    with open(filename, 'w') as file:
+        for pos in position:
+            file.write(f"v {pos[0]:.3f} {pos[1]:.3f} {pos[2]:.3f}\n" ) 
+        
+        for edge in edges:
+            file.write(f"l {(edge[0]+1):d} {(edge[1]+1):d}\n" ) 
+        
+        for triangle  in triangles:
+            file.write(f"f {(triangle[0]+1):d} {(triangle[1]+1):d} {(triangle[2]+1):d}\n" ) 

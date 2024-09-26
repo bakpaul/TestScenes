@@ -85,6 +85,32 @@ with pygmsh.geo.Geometry() as geom:
 
 meshNbPoints = len(mesh.points)
 
+
+#Duplicate triangles to have triangles on both surfaces
+frontTriangles = np.copy(mesh.cells[1].data)
+backTriangles = np.copy(mesh.cells[1].data)
+#Renumber back
+backTriangles += meshNbPoints
+
+#Find border edges and construct width triangles
+unsortedBoderEdges = utils.findBorderEdges(mesh.cells[1].data)
+sortedBorderEdges = utils.reorientAndSortBorderEdges(unsortedBoderEdges,mesh.cells[1].data)
+
+
+### Generate center for side collision
+utils.writeOBJ("EDGES_" + out_filename,np.copy(mesh.points),sortedBorderEdges)
+
+
+
+## Add triangles on the thickness
+widthTriangles = []
+for edge in sortedBorderEdges:
+    firstTriangle = [edge[0], edge[1], edge[1]+ meshNbPoints]
+    secondTriangle = [edge[1]+ meshNbPoints, edge[0]+ meshNbPoints,edge[0] ]
+    widthTriangles.append(firstTriangle)
+    widthTriangles.append(secondTriangle)
+
+
 #Duplicate and move points to have two surfaces
 front = np.copy(mesh.points)
 front[:,2] = width
@@ -93,21 +119,6 @@ back[:,2] = -width
 mesh.points = np.concatenate((front,back))
 
 
-#Duplicate triangles to have triangles on both surfaces
-frontTriangles = np.copy(mesh.cells[1].data)
-backTriangles = np.copy(mesh.cells[1].data)
-backTriangles += meshNbPoints
-
-#Find border edges and construct width triangles
-unsortedBoderEdges = utils.findBorderEdges(mesh.cells[1].data)
-sortedBorderEdges = utils.reorientAndSortBorderEdges(unsortedBoderEdges,mesh.cells[1].data)
-
-widthTriangles = []
-for edge in sortedBorderEdges:
-    firstTriangle = [edge[0], edge[1], edge[1]+ meshNbPoints]
-    secondTriangle = [edge[1]+ meshNbPoints, edge[0]+ meshNbPoints,edge[0] ]
-    widthTriangles.append(firstTriangle)
-    widthTriangles.append(secondTriangle)
 
 
 mesh.cells[1].data = np.concatenate((frontTriangles,backTriangles,np.array(widthTriangles)))
