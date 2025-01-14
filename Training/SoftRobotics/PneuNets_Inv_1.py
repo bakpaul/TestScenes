@@ -18,7 +18,7 @@ def createScene(rootNode):
     goal = rootNode.addChild('goal')
     goal.addObject('EulerImplicitSolver', firstOrder=True)
     goal.addObject('CGLinearSolver', iterations=100, tolerance=1e-5, threshold=1e-5)
-    goal.addObject('MechanicalObject', name='goalMO', position=[[-230, 15, 0]])
+    goal.addObject('MechanicalObject', name='goalMO', position=[[-195, 15, 0]])
     goal.addObject('SphereCollisionModel', radius=5, group=3)
     goal.addObject('UncoupledConstraintCorrection')
 
