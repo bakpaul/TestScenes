@@ -12,7 +12,7 @@ def createScene(rootNode):
 													 'Sofa.Component.Constraint.Projective','Sofa.Component.Engine.Select',
                                                      'Sofa.Component.Constraint.Lagrangian.Correction','Sofa.Component.Constraint.Lagrangian.Model',
                                                      'Sofa.Component.Constraint.Lagrangian.Solver','Sofa.Component.LinearSolver.Direct',
-                                                     'Sofa.Component.AnimationLoop'])
+                                                     'Sofa.Component.AnimationLoop','Sofa.GUI.Component'])
     
     rootNode.addObject('VisualStyle',
                        displayFlags='showVisualModels showBehaviorModels showCollisionModels '

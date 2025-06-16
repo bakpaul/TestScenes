@@ -34,8 +34,7 @@ def createScene(rootNode):
 							  tetrahedra=mechanicalModel.topologyContainer.tetrahedra.linkpath)
 	mechanicalModel.addObject('FixedProjectiveConstraint', indices=mechanicalModel.boxROI.indices.linkpath) # Project constraint enforcing fixed DoFs
 
-	
 	visualModel = mechanicalModel.addChild("Visual")
-	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNets.stl") # Loading a mesh containing ONLY the surface triangles
-	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 0.6]) # Note the different way to write the link "src"
-	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel") # Barycentric mapping connecting the two representations with different topologies
+	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNets.stl")
+	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 0.6])
+	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel")

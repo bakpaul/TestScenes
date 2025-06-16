@@ -15,6 +15,8 @@ def createScene(rootNode):
 	
 	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets.vtk") # Using a VTK file format, thus using MeshVTKLoader
 	
+	################################################
+	# Mechanical representation of the finger object
 	mechanicalModel = rootNode.addChild("Finger")
 	
 	mechanicalModel.addObject("EulerImplicitSolver")
@@ -27,3 +29,4 @@ def createScene(rootNode):
 	
 	mechanicalModel.addObject('TetrahedronFEMForceField', template='Vec3', poissonRatio=0.3, youngModulus=100) # Define an elastic constitutive law
 	mechanicalModel.addObject('DiagonalMass', template='Vec3,Vec3', totalMass=0.5) # Use a mass integrated over the volume
+	################################################

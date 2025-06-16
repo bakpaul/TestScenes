@@ -27,9 +27,11 @@ def createScene(rootNode):
 	mechanicalModel.addObject('TetrahedronFEMForceField', template='Vec3', poissonRatio=0.3, youngModulus=100)
 	mechanicalModel.addObject('DiagonalMass', template='Vec3,Vec3', totalMass=0.5)
 	
-    # Adding a rendering model using the same mesh as for the mechanics
-    # in a dedicated node connected to the mechanical model using a Mapping
+    ##########################################
+	# Visual representation of the finger object
 	visualModel = mechanicalModel.addChild("Visual")
 	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNets.stl") # Loading a mesh containing ONLY the surface triangles
 	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 0.6]) # Note the different way to write the link "src"
 	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel") # Barycentric mapping connecting the two representations with different topologies
+	##########################################
+
