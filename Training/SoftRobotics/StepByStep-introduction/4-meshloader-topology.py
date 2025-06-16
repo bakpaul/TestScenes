@@ -10,8 +10,9 @@ def createScene(rootNode):
 												     'Sofa.Component.LinearSolver.Iterative','Sofa.Component.ODESolver.Backward',
 													 'Sofa.Component.IO.Mesh','Sofa.Component.Topology.Container.Dynamic'])
 	
+	# Mesh loader taking a file as input (relative or absolute path)
 	rootNode.addObject("MeshGmshLoader", name="meshLoaderCoarse", filename="mesh/liver.msh")
-	
+
 	particleNode = rootNode.addChild("Particle") # bbox is no longer needed since we do load a volumetric mesh
 	
 	particleNode.addObject("EulerImplicitSolver")
