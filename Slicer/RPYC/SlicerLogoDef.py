@@ -40,7 +40,7 @@ def createScene(sofa_root_node : Sofa.Core.Node):
     SLICERLogo.addObject("ConstantSparsityPatternSystem", template="CompressedRowSparseMatrixd", name="A", printLog=False)
     SLICERLogo.addObject("EigenSimplicialLDLT", name="LDLTLinearSolver", template="CompressedRowSparseMatrixd",  linearSystem="@A")#,  parallelInverseProduct=True)
 
-    SLICERLogo.addObject("MeshVTKLoader", name="LogoLoader", filename="../Data/Slicer_volume.vtk"  )
+    SLICERLogo.addObject("MeshVTKLoader", name="LogoLoader", filename="../../Data/Slicer_volume.vtk"  )
     SLICERLogo.addObject("TetrahedronSetTopologyContainer", name="Container", src="@LogoLoader" )
     SLICERLogo.addObject("TetrahedronSetTopologyModifier", name="Modifier",)
     SLICERLogo.addObject("MechanicalObject", name="LogoDOF", template="Vec3d" )
@@ -56,7 +56,7 @@ def createScene(sofa_root_node : Sofa.Core.Node):
 
 
     SLICERCollisionBorder = SLICERLogo.addChild("CollisionBorder")
-    SLICERCollisionBorder.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/Slicer_surface.obj")
+    SLICERCollisionBorder.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../../Data/Slicer_surface.obj")
     SLICERCollisionBorder.addObject("MeshTopology", name="CollisionTopo", src="@SurfaceLoader")
     SLICERCollisionBorder.addObject("MechanicalObject", name="CollisionDOF", src="@CollisionTopo" )
     SLICERCollisionBorder.addObject("LineCollisionModel", selfCollision=False, topology="@CollisionTopo")
@@ -64,7 +64,7 @@ def createScene(sofa_root_node : Sofa.Core.Node):
 
 
     SLICERVisu = SLICERLogo.addChild("Visu")
-    SLICERVisu.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../Data/Slicer_surface.obj")
+    SLICERVisu.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../../Data/Slicer_surface.obj")
     SLICERVisu.addObject("OglModel", name="VisualModel", color=[0.7, 0.7, 0.7, 1], position="@SurfaceLoader.position", triangles="@SurfaceLoader.triangles" )
     SLICERVisu.addObject("BarycentricMapping", name="MappingVisu", isMechanical="false", input="@../LogoDOF", output="@VisualModel" )
 
