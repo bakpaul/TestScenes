@@ -6,15 +6,66 @@ import importlib.util
 import pathlib
 import numpy as np
 from multiprocessing import shared_memory
+import operator
 
 class SOFAService(rpyc.SlaveService):
 
-    class SOFASharedMemoryProxy():
-        def __init__(self, object, item, previous):
-            self.object = object
-            self.item = item
-            self.previous = previous
+    class SharedMemoryInfo():
+        def __init__(self,shape, dtype, sharedMem):
+            self.shape = shape
+            self.dtype = dtype
+            self.sharedMem = sharedMem
+            
+        def getSharedName(self):
+            return self.sharedMem.name
 
+        def getDataInfo(self):
+            return {"shape" : self.shape, "dtype" : self.dtype}
+
+
+    class SOFASharedMemoryProxy():
+
+        def __init__(self,parent):
+            self.parent = parent
+            self.items = []
+
+        #This method is called when the return object is of this proxy type
+        def get_data(self):
+            caller =  operator.attrgetter(".".join(self.items))                                          
+            return caller(self.parent.exposed_sofa_root)
+            
+
+        def shared_data_name(self):
+            name = ""
+            if len(self.items) != 0 :
+               
+                for compName in self.items[:-1]:
+                    name += f"/{compName}"
+                
+                if name != "":
+                    name += '.'
+                
+                name += self.items[-1]
+
+            return name
+
+        #If this method is called, then it means the used called a method of one of the sofa object, then just return the result and let rpyc deal with it
+        def __call__(self, *args, **kwds):
+            caller =  operator.attrgetter(".".join(self.items))                                          
+            return caller(self.parent.exposed_sofa_root).__call__(*args,**kwds)
+            
+        
+
+        def getattr(self,item):
+            shared_name = self.shared_data_name()
+            
+            #If this is true then someone tried to access the value of a shared data, the copy it and return the shared info
+            if(shared_name in self.parent.sharedPaths and item == "value"):
+                self.parent.copy_shared_data_into_memory(shared_name)
+                return self.parent.sharedPaths(shared_name)
+            
+            self.items.append(item)    
+            return self
         
 
     exposed_sofa_root : Sofa.Core.Node
@@ -33,8 +84,8 @@ class SOFAService(rpyc.SlaveService):
     def on_disconnect(self, conn):
         self.exposed_pause_simulation()
         for sm in self.sharedMemory:
-            sm.unlink()
-            sm.close()
+            sm.sharedMem.unlink()
+            sm.sharedMem.close()
 
     def exposed_build_scene_graph_from_method(self, createScene):
         self.exposed_sofa_root = Sofa.Core.Node("root")
@@ -58,11 +109,9 @@ class SOFAService(rpyc.SlaveService):
         dataName = paths[-1].split('.')[1]
         paths[-1] = paths[-1].split('.')[0]
 
-        tempObj = self.exposed_sofa_root
-        for p in paths:
-            tempObj = getattr(tempObj,p)
+        caller =  operator.attrgetter(".".join(paths))                                          
 
-        return getattr(getattr(tempObj,dataName),"value")
+        return caller(self.exposed_sofa_root).value
 
     def exposed_setup_shared_memory_for_data(self, dataPaths:list[str], delayed=False):
         self.paths_for_shared_mem = dataPaths
@@ -70,18 +119,20 @@ class SOFAService(rpyc.SlaveService):
             self.paths_for_shared_mem = self.__internal_setup_shared_memory()
 
     def __internal_setup_shared_memory(self):
-        sharedPaths = {}
         self.sharedMemory = []
+        self.sharedPaths = {}
         for paths in self.paths_for_shared_mem:
             data = self.__internal_getattr(paths)
             if( isinstance(data, np.ndarray)):
                 print(f"Sharing {data.size*data.itemsize} bytes for data {paths}")
-                self.sharedMemory.append(shared_memory.SharedMemory(create=True, size=data.size*data.itemsize))
-                sharedPaths[paths] = self.sharedMemory[-1].name
+                self.sharedMemory.append(SOFAService.SharedMemoryInfo(data.shape, data.dtype, shared_memory.SharedMemory(create=True, size=data.size*data.itemsize)))
+                self.sharedPaths[paths] = self.sharedMemory[-1].name
             else:
                 print(f"Not creating a shared memory for data {paths} because it is no a numpy array")
-        return sharedPaths
+        return self.sharedPaths
 
+    def getSharedMemoryNames(self):
+        return self.sharedPaths
 
 
     def __wait_for_the_animation_to_stop(self):
