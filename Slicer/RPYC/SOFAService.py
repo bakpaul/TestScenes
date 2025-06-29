@@ -4,8 +4,18 @@ import threading
 import Sofa
 import importlib.util
 import pathlib
+import numpy as np
+from multiprocessing import shared_memory
 
 class SOFAService(rpyc.SlaveService):
+
+    class SOFASharedMemoryProxy():
+        def __init__(self, object, item, previous):
+            self.object = object
+            self.item = item
+            self.previous = previous
+
+        
 
     exposed_sofa_root : Sofa.Core.Node
 
@@ -13,6 +23,7 @@ class SOFAService(rpyc.SlaveService):
     def __init__(self, *args, **kwargs):
         rpyc.Service.__init__(self,*args, **kwargs)
         self.animationThread = None
+        self.sharedMemory = None
 
     def on_connect(self, conn):
         self.exposed_sofa_root = Sofa.Core.Node("root")
@@ -21,7 +32,9 @@ class SOFAService(rpyc.SlaveService):
 
     def on_disconnect(self, conn):
         self.exposed_pause_simulation()
-        pass
+        for sm in self.sharedMemory:
+            sm.unlink()
+            sm.close()
 
     def exposed_build_scene_graph_from_method(self, createScene):
         self.exposed_sofa_root = Sofa.Core.Node("root")
@@ -39,6 +52,36 @@ class SOFAService(rpyc.SlaveService):
         self.exposed_sofa_root = Sofa.Core.Node("root")
         foo.createScene(self.exposed_sofa_root)
         Sofa.Simulation.initRoot(self.exposed_sofa_root)
+
+    def __internal_getattr(self, path):
+        paths = path.split('/')
+        dataName = paths[-1].split('.')[1]
+        paths[-1] = paths[-1].split('.')[0]
+
+        tempObj = self.exposed_sofa_root
+        for p in paths:
+            tempObj = getattr(tempObj,p)
+
+        return getattr(getattr(tempObj,dataName),"value")
+
+    def exposed_setup_shared_memory_for_data(self, dataPaths:list[str], delayed=False):
+        self.paths_for_shared_mem = dataPaths
+        if(not delayed):
+            self.paths_for_shared_mem = self.__internal_setup_shared_memory()
+
+    def __internal_setup_shared_memory(self):
+        sharedPaths = {}
+        self.sharedMemory = []
+        for paths in self.paths_for_shared_mem:
+            data = self.__internal_getattr(paths)
+            if( isinstance(data, np.ndarray)):
+                print(f"Sharing {data.size*data.itemsize} bytes for data {paths}")
+                self.sharedMemory.append(shared_memory.SharedMemory(create=True, size=data.size*data.itemsize))
+                sharedPaths[paths] = self.sharedMemory[-1].name
+            else:
+                print(f"Not creating a shared memory for data {paths} because it is no a numpy array")
+        return sharedPaths
+
 
 
     def __wait_for_the_animation_to_stop(self):

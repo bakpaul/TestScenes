@@ -14,7 +14,7 @@ maxDist = 18.1
 iter = 30
 meshScale = 0.3
 mesh_size = 40
-width = 10
+width = 30
 filename = 'Slicer_LOGO.svg'
 out_filename = 'Slicer_collision.obj'
 
