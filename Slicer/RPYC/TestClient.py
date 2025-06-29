@@ -54,6 +54,8 @@ class SOFAClient():
         pass
 
     def __getattr__(self, item):
+        if item == "sofa_root":
+            return self.connection.getSofaSharedProxy()
         print(f"SOFAClient __getattr__ {item}")
         return(getattr(SC.connection.root,item))
         

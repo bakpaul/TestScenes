@@ -29,12 +29,6 @@ class SOFAService(rpyc.SlaveService):
             self.parent = parent
             self.items = []
 
-        #This method is called when the return object is of this proxy type
-        def get_data(self):
-            caller =  operator.attrgetter(".".join(self.items))                                          
-            return caller(self.parent.exposed_sofa_root)
-            
-
         def shared_data_name(self):
             name = ""
             if len(self.items) != 0 :
@@ -63,6 +57,11 @@ class SOFAService(rpyc.SlaveService):
             if(shared_name in self.parent.sharedPaths and item == "value"):
                 self.parent.copy_shared_data_into_memory(shared_name)
                 return self.parent.sharedPaths(shared_name)
+            
+            elif item == "value":
+                caller =  operator.attrgetter(".".join(self.items))                                          
+                return caller(self.parent.exposed_sofa_root)
+           
             
             self.items.append(item)    
             return self
@@ -134,6 +133,9 @@ class SOFAService(rpyc.SlaveService):
     def getSharedMemoryNames(self):
         return self.sharedPaths
 
+    def getSofaSharedProxy(self):
+        return SOFAService.SOFASharedMemoryProxy(self)
+    
 
     def __wait_for_the_animation_to_stop(self):
         if(self.animationThread is not None and self.animationThread.is_alive()):
