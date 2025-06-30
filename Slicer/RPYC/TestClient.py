@@ -10,9 +10,7 @@ class SOFAClient():
 
     def start_server(self, port=18813):
 
-        self.server = rpyc.ForkingServer(service=SOFAService(), hostname="localhost", port=port,protocol_config={'allow_public_attrs': True,
-                                                                                                                  'allow_all_attrs': True,
-                                                                                                                  'allow_pickle': True })
+        self.server = rpyc.ForkingServer(service=SOFAService(), hostname="localhost", port=port,protocol_config={'allow_public_attrs': True, 'allow_all_attrs': True,'allow_pickle': True })
 
         self.serverProcess = multiprocessing.Process(target = self.server.start)
         self.serverProcess.start()
@@ -54,22 +52,23 @@ class SOFAClient():
         pass
 
     def __getattr__(self, item):
-        if item == "sofa_root":
-            return self.connection.getSofaSharedProxy()
-        print(f"SOFAClient __getattr__ {item}")
-        return(getattr(SC.connection.root,item))
+        if item == "sofa_root" and self.connection.root.sharedMemoryIsSet and self.connection.root.sharedMemoryIsUsed :
+            return SOFAService.SOFASharedMemoryProxy(self.connection.root)
+        return(getattr(self.connection.root,item))
         
 
 if __name__ == "__main__":
 
 
     SC = SOFAClient()
-    SC.start_server()
-    SC.connect_client()
+    SC.start_server(port=18812)
+    SC.connect_client(port=18812)
 
     SC.load_scene("SlicerLogoDef.py")
 
     SC.setup_shared_memory_for_data(["SlicerLogo/LogoDOF.position","SlicerLogo/CollisionBorder/CollisionDOF.position"])
+
+
 
     asynch_step = None
     currentTime = 0.0
@@ -78,6 +77,10 @@ if __name__ == "__main__":
             #Time to get data from object
             currentTime = SC.sofa_root.getTime()
             print(currentTime)
+    
+            print(f"This comes with the socket : {SC.sofa_root.SlicerLogo.EulerImplicitScheme.name.value}")
+            print(f"This comes with shared memory : {SC.sofa_root.SlicerLogo.CollisionBorder.CollisionDOF.position.value}")
+
             #Launch next step
             asynch_step = SC.asynch_step()
         else:

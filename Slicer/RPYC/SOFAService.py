@@ -34,10 +34,7 @@ class SOFAService(rpyc.SlaveService):
             if len(self.items) != 0 :
                
                 for compName in self.items[:-1]:
-                    name += f"/{compName}"
-                
-                if name != "":
-                    name += '.'
+                    name += f"{compName}."
                 
                 name += self.items[-1]
 
@@ -50,30 +47,45 @@ class SOFAService(rpyc.SlaveService):
             
         
 
-        def getattr(self,item):
+        def __getattr__(self,item):
             shared_name = self.shared_data_name()
             
-            #If this is true then someone tried to access the value of a shared data, the copy it and return the shared info
-            if(shared_name in self.parent.sharedPaths and item == "value"):
+            #Check if until now we are still on the path of a tracked data
+            tracked_data = False
+            for path in self.parent.sharedPaths:
+                if shared_name in path:
+                    tracked_data = True
+                    break
+
+            #If we are exactly a tracked data and the value is accessed, then use shared memory
+            if tracked_data and shared_name in self.parent.sharedPaths and item == "value":
                 self.parent.copy_shared_data_into_memory(shared_name)
-                return self.parent.sharedPaths(shared_name)
+                shm = shared_memory.SharedMemory(name=self.parent.sharedMemory[shared_name].getSharedName())
+                print(f"USING SHARED MEMORY {shared_name} as {str(self.parent.sharedMemory[shared_name].dtype)}")
+                # Now create a NumPy array backed by shared memory
+                return np.ndarray(self.parent.sharedMemory[shared_name].shape,str(self.parent.sharedMemory[shared_name].dtype), buffer = shm.buf)
             
-            elif item == "value":
-                caller =  operator.attrgetter(".".join(self.items))                                          
+
+            #If we either are not a tracked path anymore or we are the actual data but it is not the value that is accessed
+            elif not tracked_data or (shared_name in self.parent.sharedPaths and item != "value"):
+                print(f"GOING OUT AT {shared_name + '.' +item}")
+                caller =  operator.attrgetter(".".join(self.items + [item]))                                          
                 return caller(self.parent.exposed_sofa_root)
            
-            
+            #We arrive here only if we are still in a ptracked path but we are not exactly one tracked path
             self.items.append(item)    
             return self
         
 
     exposed_sofa_root : Sofa.Core.Node
-
+    sharedPaths : dict
     
     def __init__(self, *args, **kwargs):
         rpyc.Service.__init__(self,*args, **kwargs)
         self.animationThread = None
         self.sharedMemory = None
+        self.sharedMemoryIsSet = False
+        self.sharedMemoryIsUsed = False
 
     def on_connect(self, conn):
         self.exposed_sofa_root = Sofa.Core.Node("root")
@@ -103,39 +115,42 @@ class SOFAService(rpyc.SlaveService):
         foo.createScene(self.exposed_sofa_root)
         Sofa.Simulation.initRoot(self.exposed_sofa_root)
 
-    def __internal_getattr(self, path):
-        paths = path.split('/')
-        dataName = paths[-1].split('.')[1]
-        paths[-1] = paths[-1].split('.')[0]
-
-        caller =  operator.attrgetter(".".join(paths))                                          
-
-        return caller(self.exposed_sofa_root).value
-
     def exposed_setup_shared_memory_for_data(self, dataPaths:list[str], delayed=False):
         self.paths_for_shared_mem = dataPaths
         if(not delayed):
             self.paths_for_shared_mem = self.__internal_setup_shared_memory()
 
     def __internal_setup_shared_memory(self):
-        self.sharedMemory = []
-        self.sharedPaths = {}
+        self.sharedMemory = {}
+        self.sharedPaths = []
+        self.sharedMemoryIsSet = True
         for paths in self.paths_for_shared_mem:
-            data = self.__internal_getattr(paths)
+
+            paths = paths.replace('/','.')
+            while len(paths) > 1 and paths[0] in "@." :
+                paths = paths[1:]
+
+            caller =  operator.attrgetter(paths)                                          
+            data = caller(self.exposed_sofa_root).value
             if( isinstance(data, np.ndarray)):
                 print(f"Sharing {data.size*data.itemsize} bytes for data {paths}")
-                self.sharedMemory.append(SOFAService.SharedMemoryInfo(data.shape, data.dtype, shared_memory.SharedMemory(create=True, size=data.size*data.itemsize)))
-                self.sharedPaths[paths] = self.sharedMemory[-1].name
+                self.sharedMemory[paths] = SOFAService.SharedMemoryInfo(data.shape, data.dtype, shared_memory.SharedMemory(create=True, size=data.size*data.itemsize))
+                self.sharedPaths.append(paths)
             else:
                 print(f"Not creating a shared memory for data {paths} because it is no a numpy array")
+        self.sharedMemoryIsUsed = len(self.sharedPaths) != 0
         return self.sharedPaths
+    
+    def exposed_copy_shared_data_into_memory(self,shared_name):
+        shm = shared_memory.SharedMemory(name=self.sharedMemory[shared_name].getSharedName())
+        caller =  operator.attrgetter(shared_name)                                          
+        data = caller(self.exposed_sofa_root).value
+        b = np.ndarray(data.shape, dtype=data.dtype, buffer=shm.buf)
+        b[:] = data[:]  
 
     def getSharedMemoryNames(self):
         return self.sharedPaths
 
-    def getSofaSharedProxy(self):
-        return SOFAService.SOFASharedMemoryProxy(self)
-    
 
     def __wait_for_the_animation_to_stop(self):
         if(self.animationThread is not None and self.animationThread.is_alive()):
@@ -178,6 +193,8 @@ class SOFAService(rpyc.SlaveService):
 
     def exposed_step_simulation(self):
         Sofa.Simulation.animate(self.exposed_sofa_root, self.exposed_sofa_root.dt.value)
+        if(not self.sharedMemoryIsSet):
+            self.__internal_setup_shared_memory()
 
         
         
