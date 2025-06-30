@@ -6,27 +6,18 @@ import importlib.util
 import pathlib
 import numpy as np
 from multiprocessing import shared_memory
+import multiprocessing
 import operator
 
-class SOFAService(rpyc.SlaveService):
 
-    class SharedMemoryInfo():
-        def __init__(self,shape, dtype, sharedMem):
-            self.shape = shape
-            self.dtype = dtype
-            self.sharedMem = sharedMem
-            
-        def getSharedName(self):
-            return self.sharedMem.name
-
-        def getDataInfo(self):
-            return {"shape" : self.shape, "dtype" : self.dtype}
+class SOFAClient():
 
 
     class SOFASharedMemoryProxy():
 
-        def __init__(self,parent):
-            self.parent = parent
+        def __init__(self, client, server):
+            self.client = client
+            self.server = server
             self.items = []
 
         def shared_data_name(self):
@@ -43,7 +34,7 @@ class SOFAService(rpyc.SlaveService):
         #If this method is called, then it means the used called a method of one of the sofa object, then just return the result and let rpyc deal with it
         def __call__(self, *args, **kwds):
             caller =  operator.attrgetter(".".join(self.items))                                          
-            return caller(self.parent.exposed_sofa_root).__call__(*args,**kwds)
+            return caller(self.server.exposed_sofa_root).__call__(*args,**kwds)
             
         
 
@@ -52,30 +43,95 @@ class SOFAService(rpyc.SlaveService):
             
             #Check if until now we are still on the path of a tracked data
             tracked_data = False
-            for path in self.parent.sharedPaths:
+            for path in self.server.sharedPaths:
                 if shared_name in path:
                     tracked_data = True
                     break
 
             #If we are exactly a tracked data and the value is accessed, then use shared memory
-            if tracked_data and shared_name in self.parent.sharedPaths and item == "value":
-                self.parent.copy_shared_data_into_memory(shared_name)
-                shm = shared_memory.SharedMemory(name=self.parent.sharedMemory[shared_name].getSharedName())
-                print(f"USING SHARED MEMORY {shared_name} as {str(self.parent.sharedMemory[shared_name].dtype)}")
+            if tracked_data and shared_name in self.server.sharedPaths and item == "value":
+                self.server.copy_shared_data_into_memory(shared_name)
+                if not shared_name in self.client.sharedMemory :
+                    self.client.sharedMemory[shared_name] = shared_memory.SharedMemory(name=self.server.sharedMemory[shared_name].getSharedName())
                 # Now create a NumPy array backed by shared memory
-                return np.ndarray(self.parent.sharedMemory[shared_name].shape,str(self.parent.sharedMemory[shared_name].dtype), buffer = shm.buf)
+                return np.ndarray(self.server.sharedMemory[shared_name].shape,str(self.server.sharedMemory[shared_name].dtype), buffer = self.client.sharedMemory[shared_name].buf)
             
 
             #If we either are not a tracked path anymore or we are the actual data but it is not the value that is accessed
-            elif not tracked_data or (shared_name in self.parent.sharedPaths and item != "value"):
-                print(f"GOING OUT AT {shared_name + '.' +item}")
+            elif not tracked_data or (shared_name in self.server.sharedPaths and item != "value"):
                 caller =  operator.attrgetter(".".join(self.items + [item]))                                          
-                return caller(self.parent.exposed_sofa_root)
+                return caller(self.server.exposed_sofa_root)
            
             #We arrive here only if we are still in a ptracked path but we are not exactly one tracked path
             self.items.append(item)    
             return self
         
+    def __init__(self):
+        self.sharedMemory = {}
+        
+    def start_server(self, port=18813):
+
+        self.server = rpyc.ForkingServer(service=SOFAService(), hostname="localhost", port=port,protocol_config={'allow_public_attrs': True, 'allow_all_attrs': True,'allow_pickle': True })
+
+        self.serverProcess = multiprocessing.Process(target = self.server.start)
+        self.serverProcess.start()
+
+
+    def connect_client(self,hostename="localhost", port=18813,  number_of_attempt = 10, wait_time = 0.1):
+        it = 0
+        connected = self.__internal_connect_to_client(hostename=hostename, port=port)
+        
+        while(not connected and it < number_of_attempt):
+            time.sleep(wait_time)
+            connected = self.__internal_connect_to_client(hostename=hostename, port=port)
+            it += 1
+
+        if(connected):
+            self.async_step_executor = rpyc.async_(self.connection.root.step_simulation)
+
+        return connected
+
+
+    def __internal_connect_to_client(self, hostename, port):
+        try:
+            self.connection = rpyc.connect(hostename, port, config = {'allow_public_attrs': True, "allow_all_attrs": True, "allow_pickle": True})
+        except ConnectionRefusedError:
+            return False
+        return True
+    
+    def load_scene(self, filename):
+        self.connection.root.exposed_build_scene_graph_from_file(filename)
+
+    def asynch_step(self):
+        return self.async_step_executor()
+
+    def stop_server(self):
+        self.connection.close()
+        self.serverProcess.terminate()
+
+    def get_data_from_shared_memory(self,dataPath):
+        pass
+
+    def __getattr__(self, item):
+        if item == "sofa_root" and self.connection.root.sharedMemoryIsSet and self.connection.root.sharedMemoryIsUsed :
+            return SOFAClient.SOFASharedMemoryProxy(client = self, server = self.connection.root)
+        return(getattr(self.connection.root,item))
+        
+
+class SOFAService(rpyc.SlaveService):
+
+    class SharedMemoryInfo():
+        def __init__(self,shape, dtype, sharedMem):
+            self.shape = shape
+            self.dtype = dtype
+            self.sharedMem = sharedMem
+            
+        def getSharedName(self):
+            return self.sharedMem.name
+
+        def getDataInfo(self):
+            return {"shape" : self.shape, "dtype" : self.dtype}
+
 
     exposed_sofa_root : Sofa.Core.Node
     sharedPaths : dict
@@ -133,9 +189,10 @@ class SOFAService(rpyc.SlaveService):
             caller =  operator.attrgetter(paths)                                          
             data = caller(self.exposed_sofa_root).value
             if( isinstance(data, np.ndarray)):
-                print(f"Sharing {data.size*data.itemsize} bytes for data {paths}")
-                self.sharedMemory[paths] = SOFAService.SharedMemoryInfo(data.shape, data.dtype, shared_memory.SharedMemory(create=True, size=data.size*data.itemsize))
+                self.sharedMemory[paths] = SOFAService.SharedMemoryInfo(data.shape, data.dtype, shared_memory.SharedMemory(create=True, size=data.nbytes))
                 self.sharedPaths.append(paths)
+                print(f"Sharing {data.nbytes} bytes for data {paths}.")
+
             else:
                 print(f"Not creating a shared memory for data {paths} because it is no a numpy array")
         self.sharedMemoryIsUsed = len(self.sharedPaths) != 0
