@@ -9,8 +9,8 @@ import scipy
 # Function called when the scene graph is being created
 def createScene(sofa_root_node : Sofa.Core.Node):
 
-    sofa_root_node.gravity = [0,-100,0]
-    sofa_root_node.dt = 0.01
+    sofa_root_node.gravity.setValue([0,-100,0])
+    sofa_root_node.dt.setValue(0.01)
 
     #Loading the dynamic libraries required for this scene
     sofa_root_node.addObject("RequiredPlugin",pluginName=["Sofa.Component.IO.Mesh", "Sofa.Component.LinearSolver.Direct", "Sofa.Component.LinearSolver.Iterative",

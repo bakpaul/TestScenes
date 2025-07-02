@@ -22,7 +22,25 @@ class SOFAClient():
 
         #If this method is called, then it means the used called a method of one of the sofa object, then just return the result and let rpyc deal with it
         def __call__(self, *args, **kwds):
-            caller =  operator.attrgetter(self.path)                                          
+            
+            caller =  operator.attrgetter(self.path)
+
+            lastObject = self.path.split('.')[-1]
+
+            if lastObject == "getValue":
+                if self.path in self.server.sharedPaths:
+                    return self.__internal_wrap_shared_data(self.path)
+                else:
+                    caller =  operator.attrgetter(self.path)                                          
+                    return caller(self.server.exposed_sofa_root).value
+                
+            elif lastObject == "setValue":
+                if self.path in self.server.sharedPaths:
+                    self.server.set_data_from_shared(self.path, *args, **kwds)
+                else:
+                    self.server.set_data_default(self.path, *args, **kwds)
+
+
             return caller(self.server.exposed_sofa_root).__call__(*args,**kwds)
         
 

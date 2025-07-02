@@ -29,6 +29,10 @@ if __name__ == "__main__":
     
             print(f"This comes with the socket : {SC.sofa_root.SlicerLogo.EulerImplicitScheme.name.value}")
             print(f"This comes with shared memory : {SC.sofa_root.SlicerLogo.CollisionBorder.CollisionDOF.position.value}")
+            print(f"This getValue comes with the socket : {SC.sofa_root.SlicerLogo.EulerImplicitScheme.name.getValue()}")
+            print(f"This getValue comes with shared memory : {SC.sofa_root.SlicerLogo.CollisionBorder.CollisionDOF.position.getValue()}")
+            SC.sofa_root.SlicerLogo.EulerImplicitScheme.printLog.setValue(True)
+            SC.sofa_root.SlicerLogo.CollisionBorder.CollisionDOF.position.setValue([[0,0,0]])
 
             #Launch next step
             asynch_step = SC.asynch_step()
