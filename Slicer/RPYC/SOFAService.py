@@ -46,18 +46,20 @@ class SOFAClient():
 
             #If we either are not a tracked path anymore or we are the actual data but it is not the value that is accessed
             elif not tracked_data or (self.path in self.server.sharedPaths and item != "value"):
-                if(self.path != ""):
-                    self.path += '.'
-                self.path += item    
+                outPath = self.path
+                if(outPath != ""):
+                    outPath += '.'
+                outPath += item   
             
-                caller =  operator.attrgetter(self.path)                                          
+                caller =  operator.attrgetter(outPath)                                          
                 return caller(self.server.exposed_sofa_root)
            
             #We arrive here only if we are still in a ptracked path but we are not exactly one tracked path
-            if(self.path != ""):
-                self.path += '.'
-            self.path += item    
-            return self
+            outPath = self.path
+            if(outPath != ""):
+                outPath += '.'
+            outPath += item    
+            return SOFAClient.SOFASharedMemoryProxy(self.client, self.server, outPath)
         
     def __init__(self):
         self.sharedMemory = {}
