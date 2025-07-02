@@ -15,55 +15,48 @@ class SOFAClient():
 
     class SOFASharedMemoryProxy():
 
-        def __init__(self, client, server):
+        def __init__(self, client, server, path = ""):
             self.client = client
             self.server = server
-            self.items = []
-
-        def shared_data_name(self):
-            name = ""
-            if len(self.items) != 0 :
-               
-                for compName in self.items[:-1]:
-                    name += f"{compName}."
-                
-                name += self.items[-1]
-
-            return name
+            self.path = path
 
         #If this method is called, then it means the used called a method of one of the sofa object, then just return the result and let rpyc deal with it
         def __call__(self, *args, **kwds):
-            caller =  operator.attrgetter(".".join(self.items))                                          
+            caller =  operator.attrgetter(self.path)                                          
             return caller(self.server.exposed_sofa_root).__call__(*args,**kwds)
-            
         
 
         def __getattr__(self,item):
-            shared_name = self.shared_data_name()
             
             #Check if until now we are still on the path of a tracked data
             tracked_data = False
             for path in self.server.sharedPaths:
-                if shared_name in path:
+                if self.path in path:
                     tracked_data = True
                     break
 
             #If we are exactly a tracked data and the value is accessed, then use shared memory
-            if tracked_data and shared_name in self.server.sharedPaths and item == "value":
-                self.server.copy_shared_data_into_memory(shared_name)
-                if not shared_name in self.client.sharedMemory :
-                    self.client.sharedMemory[shared_name] = shared_memory.SharedMemory(name=self.server.sharedMemory[shared_name].getSharedName())
+            if tracked_data and self.path in self.server.sharedPaths and item == "value":
+                self.server.copy_shared_data_into_memory(self.path)
+                if not self.path in self.client.sharedMemory :
+                    self.client.sharedMemory[self.path] = shared_memory.SharedMemory(name=self.server.sharedMemory[self.path].getSharedName())
                 # Now create a NumPy array backed by shared memory
-                return np.ndarray(self.server.sharedMemory[shared_name].shape,str(self.server.sharedMemory[shared_name].dtype), buffer = self.client.sharedMemory[shared_name].buf)
+                return np.ndarray(self.server.sharedMemory[self.path].shape,str(self.server.sharedMemory[self.path].dtype), buffer = self.client.sharedMemory[self.path].buf)
             
 
             #If we either are not a tracked path anymore or we are the actual data but it is not the value that is accessed
-            elif not tracked_data or (shared_name in self.server.sharedPaths and item != "value"):
-                caller =  operator.attrgetter(".".join(self.items + [item]))                                          
+            elif not tracked_data or (self.path in self.server.sharedPaths and item != "value"):
+                if(self.path != ""):
+                    self.path += '.'
+                self.path += item    
+            
+                caller =  operator.attrgetter(self.path)                                          
                 return caller(self.server.exposed_sofa_root)
            
             #We arrive here only if we are still in a ptracked path but we are not exactly one tracked path
-            self.items.append(item)    
+            if(self.path != ""):
+                self.path += '.'
+            self.path += item    
             return self
         
     def __init__(self):
