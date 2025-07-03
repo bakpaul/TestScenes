@@ -29,7 +29,6 @@ def createScene(rootNode):
 	rootNode.addObject('BVHNarrowPhase')
 	rootNode.addObject('MinProximityIntersection', name="Proximity", alarmDistance="10", contactDistance="1")
 	rootNode.addObject('CollisionResponse', name="Response", response="FrictionContactConstraint",responseParams="mu=0.5") # 3. Formulate contacts as Lagrangian constraints, specifying response="LagrangianContactConstraint"
-	# responseParams="mu=0.01"
 
 	
 	mechanicalModel = rootNode.addChild("Finger")
@@ -47,7 +46,7 @@ def createScene(rootNode):
 	mechanicalModel.addObject('BoxROI', name='boxROI', box=[-10, 0, -20, 0, 30, 20], drawBoxes=True,
 						      position=mechanicalModel.StateContainer.position.linkpath,
 							  tetrahedra=mechanicalModel.topologyContainer.tetrahedra.linkpath)
-	mechanicalModel.addObject('FixedLagrangianConstraint', indices=mechanicalModel.boxROI.indices.linkpath)
+	mechanicalModel.addObject('FixedLagrangianConstraint', indices=mechanicalModel.boxROI.indices.linkpath) # For better convergence, use fixed constraint expressed as Lagrangian constraint
 	mechanicalModel.addObject('LinearSolverConstraintCorrection')  # 4. Define the way the Schur complement is computed
 
 	
