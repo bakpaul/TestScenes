@@ -28,7 +28,7 @@ def createScene(rootNode):
 	rootNode.addObject('BruteForceBroadPhase')
 	rootNode.addObject('BVHNarrowPhase')
 	rootNode.addObject('MinProximityIntersection', name="Proximity", alarmDistance="10", contactDistance="1")
-	rootNode.addObject('CollisionResponse', name="Response", response="LagrangianContactConstraint") # 3. Formulate contacts as Lagrangian constraints, specifying response="LagrangianContactConstraint"
+	rootNode.addObject('CollisionResponse', name="Response", response="FrictionContactConstraint",responseParams="mu=0.5") # 3. Formulate contacts as Lagrangian constraints, specifying response="LagrangianContactConstraint"
 	# responseParams="mu=0.01"
 
 	
