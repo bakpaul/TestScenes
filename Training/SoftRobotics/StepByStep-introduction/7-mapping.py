@@ -15,7 +15,6 @@ def createScene(rootNode):
 	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
 	
 	mechanicalModel = rootNode.addChild("Finger")
-	mechanicalModel.addObject('VisualStyle', displayFlags='showForceFields showWireframe') # See the mechanical model only in wire frame
 	
 	mechanicalModel.addObject("EulerImplicitSolver")
 	mechanicalModel.addObject("CGLinearSolver", iterations=200, tolerance=1e-09, threshold=1e-09)
@@ -30,5 +29,5 @@ def createScene(rootNode):
     # Adding a rendering model using the same mesh as for the mechanics
     # in a dedicated node connected to the mechanical model using a Mapping
 	visualModel = mechanicalModel.addChild("Visual")
-	visualModel.addObject('OglModel', name="VisualModel", src="@../../meshLoaderCoarse", color="1 0.8 0.2 0.5") # Orange color with transparency
+	visualModel.addObject('OglModel', name="VisualModel", topology="@../topologyContainer", color="1 0.8 0.2 0.5") # Orange color with transparency
 	visualModel.addObject('IdentityMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel") # Identity mapping connecting the identic topology

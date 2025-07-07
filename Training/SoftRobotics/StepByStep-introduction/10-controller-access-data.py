@@ -1,3 +1,25 @@
+
+import Sofa
+
+class ControlConstantForce(Sofa.Core.Controller):
+
+    def __init__(self, *args, **kwargs):
+        # These are needed (and the normal way to override from a python class)
+        Sofa.Core.Controller.__init__(self, *args, **kwargs)
+        self.CFF = kwargs.get("ForceField")
+
+    def onKeypressedEvent(self, event):
+        key = event['key']
+
+        if key=="+" :
+            with self.CFF.totalForce.writeableArray() as wa:
+                wa[1] += 4.
+
+        if key=="-" :
+            with self.CFF.totalForce.writeableArray() as wa:
+                wa[1] -= 4.
+
+
 def createScene(rootNode):
 
 	rootNode.name = "rootNode"
@@ -17,7 +39,7 @@ def createScene(rootNode):
 	rootNode.addObject('AttachBodyButtonSetting',stiffness=1) # Define the stiffness of the spring used with the mouse (using CTRL)
 	
 	mechanicalModel = rootNode.addChild("Finger")
-	mechanicalModel.addObject('VisualStyle', displayFlags='showForceFields showWireframe showBehaviorModels') # See bounding box too with showBehaviorModels
+	mechanicalModel.addObject('VisualStyle', displayFlags='showForceFields showBehaviorModels') # See bounding box too with showBehaviorModels
 	
 	mechanicalModel.addObject("EulerImplicitSolver")
 	mechanicalModel.addObject("CGLinearSolver", iterations=200, tolerance=1e-09, threshold=1e-09)
@@ -34,7 +56,12 @@ def createScene(rootNode):
 							  tetrahedra=mechanicalModel.topologyContainer.tetrahedra.linkpath)
 	mechanicalModel.addObject('FixedProjectiveConstraint', indices=mechanicalModel.boxROI.indices.linkpath) # Project constraint enforcing fixed DoFs
 
+	mechanicalModel.addObject('SphereROI', name='selectNodesPulledDown', centers=[[-200, 15, 0]], radii=[5], drawROI=False, drawPoints=True, drawSize=10)
+	CFF = mechanicalModel.addObject('ConstantForceField', totalForce=[0, 0, 0], indices=mechanicalModel.selectNodesPulledDown.indices.linkpath, showArrowSize=5) # Project constraint enforcing fixed DoFs
+	
 	visualModel = mechanicalModel.addChild("Visual")
 	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNet_remeshed.stl")
 	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 0.6])
 	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel")
+	
+	mechanicalModel.addObject( ControlConstantForce(name="ControlConstantForce", ForceField=CFF) )

@@ -10,7 +10,7 @@ def createScene(rootNode):
 												     'Sofa.Component.LinearSolver.Iterative','Sofa.Component.ODESolver.Backward',
 													 'Sofa.Component.IO.Mesh','Sofa.Component.Topology.Container.Dynamic',
 													 'Sofa.Component.SolidMechanics.FEM.Elastic','Sofa.Component.Topology.Container.Constant',
-													 'Sofa.Component.Visual'])
+													 'Sofa.Component.Visual','Sofa.GL.Component.Rendering3D'])
 	rootNode.addObject('VisualStyle', displayFlags='showForceFields')
 	
 	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
@@ -28,4 +28,4 @@ def createScene(rootNode):
 	mechanicalModel.addObject('MeshMatrixMass', template='Vec3,Vec3', totalMass=0.5)
 	
     # Adding a rendering model using the same mesh as for the mechanics
-	mechanicalModel.addObject('OglModel', name="VisualModel", src="@../meshLoaderCoarse")
+	mechanicalModel.addObject('OglModel', name="VisualModel", topology="@topologyContainer") # Connect with the object topology (could be connected to the mesh loader too)
