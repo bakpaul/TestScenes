@@ -13,7 +13,7 @@ def createScene(rootNode):
 													 'Sofa.Component.Visual'])
 	rootNode.addObject('VisualStyle', displayFlags='showForceFields')
 	
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets.vtk") # Using a VTK file format, thus using MeshVTKLoader
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk") # Using a VTK file format, thus using MeshVTKLoader
 	
 	################################################
 	# Mechanical representation of the finger object
@@ -28,5 +28,5 @@ def createScene(rootNode):
 	mechanicalModel.addObject("MechanicalObject", template="Vec3", name="StateContainer", showObject=True) # Define the template as Vec3 for 3D deformable bodies
 	
 	mechanicalModel.addObject('TetrahedronFEMForceField', template='Vec3', poissonRatio=0.3, youngModulus=100) # Define an elastic constitutive law
-	mechanicalModel.addObject('DiagonalMass', template='Vec3,Vec3', totalMass=0.5) # Use a mass integrated over the volume
+	mechanicalModel.addObject('MeshMatrixMass', template='Vec3,Vec3', totalMass=0.5) # Use a mass integrated over the volume
 	################################################

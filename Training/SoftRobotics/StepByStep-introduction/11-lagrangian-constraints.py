@@ -19,7 +19,7 @@ def createScene(rootNode):
 													 'Sofa.Component.Constraint.Lagrangian.Correction','Sofa.Component.Constraint.Lagrangian.Correction',
 													 'Sofa.Component.Constraint.Lagrangian.Solver','Sofa.Component.LinearSolver.Direct'])
 
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../out_coarse_sofa.vtk")
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
 	rootNode.addObject('AttachBodyButtonSetting',stiffness=1)
 	
 	rootNode.addObject('VisualStyle', displayFlags='showForceFields showCollisionModels showBehaviorModels showDetectionOutputs')
@@ -51,7 +51,7 @@ def createScene(rootNode):
 
 	
 	visualModel = mechanicalModel.addChild("Visual")
-	visualModel.addObject('MeshSTLLoader', name="loader", filename="../out_coarse_sofa.stl")
+	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNet_remeshed.stl")
 	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 1])
 	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel")
 	

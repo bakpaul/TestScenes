@@ -12,7 +12,7 @@ def createScene(rootNode):
 													 'Sofa.Component.SolidMechanics.FEM.Elastic','Sofa.Component.Topology.Container.Constant',
 													 'Sofa.Component.Visual','Sofa.Component.Mapping.Linear','Sofa.GL.Component.Rendering3D'])
 	
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets.vtk")
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
 	
 	mechanicalModel = rootNode.addChild("Finger")
 	mechanicalModel.addObject('VisualStyle', displayFlags='showForceFields showWireframe') # See the mechanical model only in wire frame
@@ -25,7 +25,7 @@ def createScene(rootNode):
 	mechanicalModel.addObject("MechanicalObject", template="Vec3", name="StateContainer", showObject=True)
 	
 	mechanicalModel.addObject('TetrahedronFEMForceField', template='Vec3', poissonRatio=0.3, youngModulus=100)
-	mechanicalModel.addObject('DiagonalMass', template='Vec3,Vec3', totalMass=0.5)
+	mechanicalModel.addObject('MeshMatrixMass', template='Vec3,Vec3', totalMass=0.5)
 	
     # Adding a rendering model using the same mesh as for the mechanics
     # in a dedicated node connected to the mechanical model using a Mapping

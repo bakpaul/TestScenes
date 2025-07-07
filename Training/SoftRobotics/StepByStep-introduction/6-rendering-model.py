@@ -13,7 +13,7 @@ def createScene(rootNode):
 													 'Sofa.Component.Visual'])
 	rootNode.addObject('VisualStyle', displayFlags='showForceFields')
 	
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets.vtk")
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
 	
 	mechanicalModel = rootNode.addChild("Finger")
 	
@@ -25,7 +25,7 @@ def createScene(rootNode):
 	mechanicalModel.addObject("MechanicalObject", template="Vec3", name="StateContainer", showObject=True)
 	
 	mechanicalModel.addObject('TetrahedronFEMForceField', template='Vec3', poissonRatio=0.3, youngModulus=100)
-	mechanicalModel.addObject('DiagonalMass', template='Vec3,Vec3', totalMass=0.5)
+	mechanicalModel.addObject('MeshMatrixMass', template='Vec3,Vec3', totalMass=0.5)
 	
     # Adding a rendering model using the same mesh as for the mechanics
 	mechanicalModel.addObject('OglModel', name="VisualModel", src="@../meshLoaderCoarse")
