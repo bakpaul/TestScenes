@@ -24,7 +24,7 @@ def createScene(sofa_root_node : Sofa.Core.Node):
                                                "Sofa.Component.Topology.Container.Grid", "Sofa.Component.Engine.Select", "Sofa.Component.Constraint.Projective"])
 
     # Rendering settings
-    sofa_root_node.addObject("VisualStyle", name="RenderingOptions", displayFlags="showVisualModels showBehaviorModels" )
+    sofa_root_node.addObject("VisualStyle", name="RenderingOptions", displayFlags="hideVisualModels hideBehaviorModels showForceFields" )
     sofa_root_node.addObject("BackgroundSetting", color=[0.8, 0.8, 0.8, 1] )
 
 
@@ -44,7 +44,7 @@ def createScene(sofa_root_node : Sofa.Core.Node):
     SLICERLogo.addObject("TetrahedronSetTopologyContainer", name="Container", src="@LogoLoader" )
     SLICERLogo.addObject("TetrahedronSetTopologyModifier", name="Modifier",)
     SLICERLogo.addObject("MechanicalObject", name="LogoDOF", template="Vec3d" )
-    SLICERLogo.addObject("TetrahedronFEMForceField", name="LinearElasticityFEM",  youngModulus=1, poissonRatio=0.3, method="large" )
+    SLICERLogo.addObject("TetrahedronFEMForceField", name="LinearElasticityFEM",  youngModulus=1, poissonRatio=0.3, method="large", computeVonMisesStress=2, showVonMisesStressPerNodeColorMapssssss=True )
     SLICERLogo.addObject("MeshMatrixMass", name="Mass", totalMass=0.05 )
 
     AttachementIndices = SLICERLogo.addObject("SphereROI",name="AttachementIndices",centers=[-120, 25, 0], radii=40, drawROI=True)
@@ -56,6 +56,7 @@ def createScene(sofa_root_node : Sofa.Core.Node):
 
 
     SLICERCollisionBorder = SLICERLogo.addChild("CollisionBorder")
+
     SLICERCollisionBorder.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../../Data/Slicer_surface.obj")
     SLICERCollisionBorder.addObject("MeshTopology", name="CollisionTopo", src="@SurfaceLoader")
     SLICERCollisionBorder.addObject("MechanicalObject", name="CollisionDOF", src="@CollisionTopo" )
@@ -64,6 +65,8 @@ def createScene(sofa_root_node : Sofa.Core.Node):
 
 
     SLICERVisu = SLICERLogo.addChild("Visu")
+    SLICERVisu.addObject("VisualStyle", name="RenderingOptions", displayFlags="showVisualModels showWireframe" )
+
     SLICERVisu.addObject("MeshOBJLoader", name="SurfaceLoader", filename="../../Data/Slicer_surface.obj")
     SLICERVisu.addObject("OglModel", name="VisualModel", color=[0.7, 0.7, 0.7, 1], position="@SurfaceLoader.position", triangles="@SurfaceLoader.triangles" )
     SLICERVisu.addObject("BarycentricMapping", name="MappingVisu", isMechanical="false", input="@../LogoDOF", output="@VisualModel" )
