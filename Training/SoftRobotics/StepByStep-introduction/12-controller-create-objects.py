@@ -1,4 +1,9 @@
 import Sofa
+from math import pi, sin
+
+uparrow = chr(19)
+downarrow = chr(21)
+
 
 class AddingParticles(Sofa.Core.Controller):
 
@@ -6,17 +11,23 @@ class AddingParticles(Sofa.Core.Controller):
 		# These are needed (and the normal way to override from a python class)
 		Sofa.Core.Controller.__init__(self, *args, **kwargs)
 		self.rootNode = kwargs.get("rootNode")
-		self.iteration = 1
+		self.iteration = 0
+
+	def generateRadius(self):
+		return 2.4*sin(self.iteration/5.5*pi - pi/4) + 2.5
+	
+	def generatXPos(self):
+		return self.iteration%11 * 10  -170
 
 	def addFallingParticle(self, node):
 		iteration_loc = self.iteration
 		newParticle = node.addChild("ParticleToCollideWith-"+str(iteration_loc))
 		newParticle.addObject("EulerImplicitSolver")
 		newParticle.addObject("CGLinearSolver", iterations=200, tolerance=1e-09, threshold=1e-09)
-		newParticle.addObject("MechanicalObject", template="Rigid3", name="myParticle", position=[(-170+10*iteration_loc), 80, 0,  0,0,0,1], showObject=True)
-		newParticle.addObject("UniformMass", totalMass=0.1)
+		newParticle.addObject("MechanicalObject", template="Rigid3", name="myParticle", position=[self.generatXPos(), 80, 0,  0,0,0,1], showObject=True)
+		newParticle.addObject("UniformMass", totalMass=1)
 		newParticle.addObject("ConstantForceField", totalForce=[0,-50,0,0,0,0], indices=0)
-		newParticle.addObject("SphereCollisionModel", radius=(10-iteration_loc), contactStiffness=100)
+		newParticle.addObject("SphereCollisionModel", radius=self.generateRadius(), contactStiffness=100)
 		newParticle.init()
 		self.iteration = iteration_loc +1
     
@@ -34,10 +45,10 @@ class AddingParticles(Sofa.Core.Controller):
 	def onKeypressedEvent(self, event):
 		key = event['key']
 
-		if key=="+" :
+		if key==uparrow :
 			self.addFallingParticle(self.rootNode)
         
-		if key=="-" :
+		if key==downarrow :
 			self.removeFallingParticle(self.rootNode)
 
 
@@ -58,7 +69,7 @@ def createScene(rootNode):
 													 'Sofa.Component.Collision.Detection.Intersection','Sofa.Component.Collision.Detection.Algorithm',
 													 'Sofa.Component.Collision.Response.Contact', 'Sofa.GUI.Component'])
 
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets_remeshed.vtk")
 	rootNode.addObject('AttachBodyButtonSetting',stiffness=1)
 	
 	rootNode.addObject('VisualStyle', displayFlags='showForceFields showCollisionModels showBehaviorModels showDetectionOutputs')
@@ -91,7 +102,7 @@ def createScene(rootNode):
 
 	
 	visualModel = mechanicalModel.addChild("Visual")
-	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNet_remeshed.stl")
+	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNets_remeshed.stl")
 	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 1])
 	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel")
 	
@@ -100,7 +111,7 @@ def createScene(rootNode):
 	collisionlModel = mechanicalModel.addChild("Collision")
 	collisionlModel.addObject("MeshTopology", name="topologyContainer", src=visualModel.loader.linkpath) # Use the same mesh topology than the visual model
 	collisionlModel.addObject('MechanicalObject', name="StoringForces") # Mechanical object storing the DoFs corresponding to the contact points and associated forces
-	collisionlModel.addObject('TriangleCollisionModel', name="CollisionModel", contactStiffness=3) # Triangular primitives used at the narrow phase
+	collisionlModel.addObject('TriangleCollisionModel', name="CollisionModel", contactStiffness=2) # Triangular primitives used at the narrow phase
 	collisionlModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@StoringForces") # Barycentric mapping connecting the two representations with different topologies
 
 	rootNode.addObject( AddingParticles(name="AddingParticles", rootNode=rootNode) )

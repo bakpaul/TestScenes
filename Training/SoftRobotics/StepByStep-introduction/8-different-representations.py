@@ -12,7 +12,7 @@ def createScene(rootNode):
 													 'Sofa.Component.SolidMechanics.FEM.Elastic','Sofa.Component.Topology.Container.Constant',
 													 'Sofa.Component.Visual','Sofa.Component.Mapping.Linear','Sofa.GL.Component.Rendering3D'])
 	
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets_remeshed.vtk")
 	
 	mechanicalModel = rootNode.addChild("Finger")
 	mechanicalModel.addObject('VisualStyle', displayFlags='showForceFields showWireframe')
@@ -30,7 +30,7 @@ def createScene(rootNode):
     ##########################################
 	# Visual representation of the finger object
 	visualModel = mechanicalModel.addChild("Visual")
-	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNet_remeshed.stl") # Loading a mesh containing ONLY the surface triangles
+	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNets_remeshed.stl") # Loading a mesh containing ONLY the surface triangles
 	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 0.6]) # Note the different way to write the link "src"
 	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel") # Barycentric mapping connecting the two representations with different topologies
 	##########################################

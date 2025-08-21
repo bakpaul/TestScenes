@@ -1,5 +1,5 @@
 import os
-from PneuNetController import PneuNetController
+
 
 def createScene(rootNode):
     rootNode.addObject('RequiredPlugin', pluginName=['SoftRobots', 'SoftRobots.Inverse'])
@@ -20,7 +20,7 @@ def createScene(rootNode):
     model.addObject('EulerImplicitSolver', rayleighStiffness=0.2, rayleighMass=0.2)
     model.addObject('SparseLDLSolver')
 
-    model.addObject('MeshVTKLoader', name='loader', filename='PneuNets.vtk')
+    model.addObject('MeshVTKLoader', name='loader', filename='PneuNets_remeshed.vtk')
     model.addObject('MeshTopology', src='@loader', name='container')
 
     model.addObject('MechanicalObject')
@@ -57,8 +57,6 @@ def createScene(rootNode):
                     maxPositiveDisp=40, minForce=0)                                  ##--> This is the actual cable actuator
     cable.addObject('BarycentricMapping')                                            ##--> Mapped on the real object
 
-
-    cable.addObject(PneuNetController(name="PneuNetController", node=model))           ##--> Add the controller into the node
 
     ##########################################
     # Visualization                          #

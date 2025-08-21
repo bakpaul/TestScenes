@@ -1,5 +1,5 @@
 import os
-
+from PneuNetsController import PneuNetsController
 
 def createScene(rootNode):
     rootNode.addObject('RequiredPlugin', pluginName=['SoftRobots', 'SoftRobots.Inverse'])
@@ -20,7 +20,7 @@ def createScene(rootNode):
     model.addObject('EulerImplicitSolver', rayleighStiffness=0.2, rayleighMass=0.2)
     model.addObject('SparseLDLSolver')
 
-    model.addObject('MeshVTKLoader', name='loader', filename='PneuNets.vtk')
+    model.addObject('MeshVTKLoader', name='loader', filename='PneuNets_remeshed.vtk')
     model.addObject('MeshTopology', src='@loader', name='container')
 
     model.addObject('MechanicalObject')
@@ -43,7 +43,7 @@ def createScene(rootNode):
     cavity.addObject('MeshTopology', src=cavity.loader.linkpath, name='topo')
     cavity.addObject('MechanicalObject', name='cavity')
     cavity.addObject('SurfacePressureConstraint', name='SPC',template='Vec3', triangles=cavity.topo.triangles.linkpath,
-                     maxVolumeGrowthVariation=500, minPressure=0)                    ##--> This is the pressure constraint
+                     maxVolumeGrowthVariation=500, minPressure=0, valueType="volumeGrowth")                    ##--> This is the pressure constraint
     cavity.addObject('BarycentricMapping')                                           ##--> Mapped on the real object
 
 
@@ -57,6 +57,8 @@ def createScene(rootNode):
                     maxPositiveDisp=40, minForce=0)                                  ##--> This is the actual cable actuator
     cable.addObject('BarycentricMapping')                                            ##--> Mapped on the real object
 
+
+    model.addObject(PneuNetsController(name="PneuNetsController", node=model))           ##--> Add the controller into the node
 
     ##########################################
     # Visualization                          #

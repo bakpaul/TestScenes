@@ -13,7 +13,7 @@ def createScene(rootNode):
 													 'Sofa.Component.Visual'])
 	rootNode.addObject('VisualStyle', displayFlags='showForceFields')
 	
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk") # Using a VTK file format, thus using MeshVTKLoader
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets_remeshed.vtk") # Using a VTK file format, thus using MeshVTKLoader
 	
 	################################################
 	# Mechanical representation of the finger object
