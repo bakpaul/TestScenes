@@ -5,7 +5,7 @@ import Sofa.Core
 from Sofa.constants import *
 
 
-class PneuNetController(Sofa.Core.Controller):
+class PneuNetsController(Sofa.Core.Controller):
     """
     This Controller simply takes the cableActuator's value
     and increases / decreases it depending on the pressed key ('+' or '-')
@@ -40,11 +40,11 @@ class PneuNetController(Sofa.Core.Controller):
 
         if((e["key"] == Sofa.constants.Key.KP_4) or (e["key"] == Sofa.constants.Key.KP_6)):
             if e["key"] == Sofa.constants.Key.KP_4:
-                pressureFinal = spcValue.value[0] + 0.005
+                volumeFinal = spcValue.value[0] + 1000
             elif e["key"] == Sofa.constants.Key.KP_6:
-                pressureFinal = spcValue.value[0] - 0.005
-                if pressureFinal < 0:
-                    pressureFinal = 0
-            spcValue.value = [pressureFinal]
+                volumeFinal = spcValue.value[0] - 1000
+                if volumeFinal < 0:
+                    volumeFinal = 0
+            spcValue.value = [volumeFinal]
 
         return

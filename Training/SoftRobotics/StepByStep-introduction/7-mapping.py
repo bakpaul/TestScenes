@@ -12,7 +12,7 @@ def createScene(rootNode):
 													 'Sofa.Component.SolidMechanics.FEM.Elastic','Sofa.Component.Topology.Container.Constant',
 													 'Sofa.Component.Visual','Sofa.Component.Mapping.Linear','Sofa.GL.Component.Rendering3D'])
 	
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets_remeshed.vtk")
 	
 	mechanicalModel = rootNode.addChild("Finger")
 	

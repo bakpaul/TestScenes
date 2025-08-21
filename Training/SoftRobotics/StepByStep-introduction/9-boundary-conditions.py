@@ -13,7 +13,7 @@ def createScene(rootNode):
 													 'Sofa.Component.Visual','Sofa.Component.Mapping.Linear','Sofa.GL.Component.Rendering3D',
 													 'Sofa.Component.Constraint.Projective','Sofa.Component.Engine.Select', 'Sofa.GUI.Component'])
 
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets_remeshed.vtk")
 	rootNode.addObject('AttachBodyButtonSetting',stiffness=1) # Define the stiffness of the spring used with the mouse (using CTRL)
 	
 	mechanicalModel = rootNode.addChild("Finger")
@@ -35,6 +35,6 @@ def createScene(rootNode):
 	mechanicalModel.addObject('FixedProjectiveConstraint', indices=mechanicalModel.boxROI.indices.linkpath) # Project constraint enforcing fixed DoFs
 
 	visualModel = mechanicalModel.addChild("Visual")
-	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNet_remeshed.stl")
+	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNets_remeshed.stl")
 	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 0.6])
 	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel")

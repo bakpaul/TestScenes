@@ -1,6 +1,10 @@
 
 import Sofa
 
+uparrow = chr(19)
+downarrow = chr(21)
+
+
 class ControlConstantForce(Sofa.Core.Controller):
 
     def __init__(self, *args, **kwargs):
@@ -11,11 +15,11 @@ class ControlConstantForce(Sofa.Core.Controller):
     def onKeypressedEvent(self, event):
         key = event['key']
 
-        if key=="+" :
+        if key==uparrow :
             with self.CFF.totalForce.writeableArray() as wa:
                 wa[1] += 4.
 
-        if key=="-" :
+        if key==downarrow :
             with self.CFF.totalForce.writeableArray() as wa:
                 wa[1] -= 4.
 
@@ -35,7 +39,7 @@ def createScene(rootNode):
 													 'Sofa.Component.Visual','Sofa.Component.Mapping.Linear','Sofa.GL.Component.Rendering3D',
 													 'Sofa.Component.Constraint.Projective','Sofa.Component.Engine.Select', 'Sofa.GUI.Component'])
 
-	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNet_remeshed.vtk")
+	rootNode.addObject("MeshVTKLoader", name="meshLoaderCoarse", filename="../PneuNets_remeshed.vtk")
 	rootNode.addObject('AttachBodyButtonSetting',stiffness=1) # Define the stiffness of the spring used with the mouse (using CTRL)
 	
 	mechanicalModel = rootNode.addChild("Finger")
@@ -60,7 +64,7 @@ def createScene(rootNode):
 	CFF = mechanicalModel.addObject('ConstantForceField', totalForce=[0, 0, 0], indices=mechanicalModel.selectNodesPulledDown.indices.linkpath, showArrowSize=5) # Project constraint enforcing fixed DoFs
 	
 	visualModel = mechanicalModel.addChild("Visual")
-	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNet_remeshed.stl")
+	visualModel.addObject('MeshSTLLoader', name="loader", filename="../PneuNets_remeshed.stl")
 	visualModel.addObject('OglModel', name="VisualModel", src=visualModel.loader.linkpath, color=[0.7, 0.7, 0.7, 0.6])
 	visualModel.addObject('BarycentricMapping', name="VisualMapping", input="@../StateContainer", output="@VisualModel")
 	

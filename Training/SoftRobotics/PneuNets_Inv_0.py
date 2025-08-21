@@ -28,7 +28,7 @@ def createScene(rootNode):
     model.addObject('EulerImplicitSolver', rayleighStiffness=0.2, rayleighMass=0.2)
     model.addObject('SparseLDLSolver')
 
-    model.addObject('MeshVTKLoader', name='loader', filename='PneuNets.vtk')
+    model.addObject('MeshVTKLoader', name='loader', filename='PneuNets_remeshed.vtk')
     model.addObject('MeshTopology', src='@loader', name='container')
 
     model.addObject('MechanicalObject')
