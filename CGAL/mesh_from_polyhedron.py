@@ -79,27 +79,17 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Creates a mesh from an input file containing a polyhedron representing the surface.")   
 
-    parser.add_argument("-i", "--input", help="The input file containing the surface. Format must be taken form ['.g', '.obj', '.stl', '.ply', '.vtk', '.vtp']") 
-    parser.add_argument( "-o", "--output", help="The output file to save the computed volumetric mesh")  
+    parser.add_argument("-i", "--input", default='data/mesh/torus.obj', help="The input file containing the surface. Format must be taken form ['.g', '.obj', '.stl', '.ply', '.vtk', '.vtp']") 
+    parser.add_argument( "-o", "--output", default='data/mesh/torusVol.vtk', help="The output file to save the computed volumetric mesh")  
     args = parser.parse_args() 
-
-    if args.input is None:
-        filename = 'data/mesh/torus.obj'
-    else:
-        filename = args.input
-
-    if args.output is None:
-        outFilename = 'data/mesh/torusVol.vtk'
-    else:
-        outFilename = args.output
     
     tic(1)
-    cmfp = CGAL_Mesh_from_polyhedron(filename=filename)
+    cmfp = CGAL_Mesh_from_polyhedron(filename=args.input)
     criteria = Default_mesh_criteria()
     criteria.facet_angle(25).facet_size(0.15).facet_distance(0.008).cell_radius_edge_ratio(3)
     cmfp.generate(criteria)
 
-    cmfp.write_out(outFilename)
+    cmfp.write_out(args.output)
     print(f"The script took a total of {toc(1)}")
 
 
