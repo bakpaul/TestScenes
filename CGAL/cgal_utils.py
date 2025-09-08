@@ -11,6 +11,78 @@ import dataclasses
 from typing import List, Optional
 
 from enum import Enum
+from pathlib import Path
+
+import time
+
+from vtkmodules.vtkIOGeometry import (
+     vtkBYUReader,
+     vtkOBJReader,
+     vtkSTLReader
+ )
+from vtkmodules.vtkIOLegacy import vtkPolyDataReader
+from vtkmodules.vtkIOPLY import vtkPLYReader
+from vtkmodules.vtkIOXML import vtkXMLPolyDataReader
+
+import vtk
+from vtk.util import numpy_support
+from vtk.numpy_interface import algorithms as algs
+
+timestamp = {}
+
+def tic(hash = 0):
+    global timestamp
+    timestamp[hash] = time.time_ns()
+
+def toc(hash = 0):
+    global timestamp
+    return f"{((time.time_ns() - timestamp[hash])/1000000):.3f} miliseconds"
+    
+
+def ReadPolyData(file_name):
+    #FROM Vtk examples https://examples.vtk.org/site/Python/Snippets/ReadPolyData/
+
+    valid_suffixes = ['.g', '.obj', '.stl', '.ply', '.vtk', '.vtp']
+
+    path = Path(file_name)
+    if path.suffix:
+        ext = path.suffix.lower()
+    if path.suffix not in valid_suffixes:
+        print(f'No reader for this file suffix: {ext}')
+        return None
+    else:
+        if ext == ".ply":
+            reader = vtkPLYReader()
+            reader.SetFileName(file_name)
+            reader.Update()
+            poly_data = reader.GetOutput()
+        elif ext == ".vtp":
+            reader = vtkXMLPolyDataReader()
+            reader.SetFileName(file_name)
+            reader.Update()
+            poly_data = reader.GetOutput()
+        elif ext == ".obj":
+            reader = vtkOBJReader()
+            reader.SetFileName(file_name)
+            reader.Update()
+            poly_data = reader.GetOutput()
+        elif ext == ".stl":
+            reader = vtkSTLReader()
+            reader.SetFileName(file_name)
+            reader.Update()
+            poly_data = reader.GetOutput()
+        elif ext == ".vtk":
+            reader = vtkPolyDataReader()
+            reader.SetFileName(file_name)
+            reader.Update()
+            poly_data = reader.GetOutput()
+        elif ext == ".g":
+            reader = vtkBYUReader()
+            reader.SetGeometryFileName(file_name)
+            reader.Update()
+            poly_data = reader.GetOutput()
+
+        return poly_data
 
 
 class CGAL_Mesh_3_IO_Util(object):
@@ -28,51 +100,106 @@ class CGAL_Mesh_3_IO_Util(object):
         self.mesh = mesh
 
     def extract(self, elems : list[Elem]):
+
+        print(f"Extracting data into numpy objects...")
+        tic()
+
         for elem in elems:
             vnbe = {}
             match elem:
                 case CGAL_Mesh_3_IO_Util.Elem.TRIANGLES:
-                    for elem in self.mesh.facets():
+                    for elemf in self.mesh.facets():
                         for i in range(3):
-                            if not elem.vertex in vnbe:
-                                vnbe[elem.vertex(i)] = 1 
+                            if not elemf.vertex in vnbe:
+                                vnbe[elemf.vertex(i)] = 1 
                             else:
                                 vnbe[elem.vertex(i)] += 1 
                 case CGAL_Mesh_3_IO_Util.Elem.TETRA:
-                    for elem in self.mesh.cells():
+                    for elemc in self.mesh.cells():
                         for i in range(4):
-                            if not elem.vertex in vnbe:
-                                vnbe[elem.vertex(i)] = 1 
+                            if not elemc.vertex in vnbe:
+                                vnbe[elemc.vertex(i)] = 1 
                             else:
-                                vnbe[elem.vertex(i)] += 1 
+                                vnbe[elemc.vertex(i)] += 1 
 
-            if CGAL_Mesh_3_IO_Util.Elem.POINTS in elems:
-                self.points = np.array([])
-            else: 
-                self.points = None
             
             V = {}
             it = 0
-            for vertice in self.mesh.triangluation().finite_vertices():
+            for vertice in self.mesh.triangulation().finite_vertices():
                 if vertice in vnbe:
                     V[vertice] = it
-                    if self.points is not None:
-                        self.points.append(self.mesh.triangluation().point(vertice))
                     it += 1 
+
+            if CGAL_Mesh_3_IO_Util.Elem.POINTS in elems:
+                self.points = np.empty((len(V),3))
+                id = 0
+                for key in V.keys():
+                    self.points[id][:] = [self.mesh.triangulation().point(key).x(), self.mesh.triangulation().point(key).y(), self.mesh.triangulation().point(key).z()]
+                    id+=1
 
             match elem:
                 case CGAL_Mesh_3_IO_Util.Elem.TRIANGLES:
-                    self.triangles = np.array([])
-                    for elem in self.mesh.facets():
-                        self.triangles.append(np.array([V[elem.vertex(0)],V[elem.vertex(1)],V[elem.vertex(2)]]))
+                    self.triangles = np.empty((self.mesh.number_of_facets(),3), dtype=np.int32)
+                    id = 0
+                    for elemt in self.mesh.facets():
+                        self.triangles[id][:]  = [V[elemt.vertex(0)],V[elemt.vertex(1)],V[elemt.vertex(2)]]
+                        id+= 1 
                 case CGAL_Mesh_3_IO_Util.Elem.TETRA:
-                    self.tetras = np.array([])
-                    for elem in self.mesh.cells():
-                        self.tetras.append(np.array([V[elem.vertex(0)],V[elem.vertex(1)],V[elem.vertex(2), V[elem.vertex(3)]]]))
-                        
+                    self.tetras = np.empty((self.mesh.number_of_cells(),4), dtype=np.int32)
+                    id = 0
+                    for elemc in self.mesh.cells():
+                        self.tetras[id][:]  = [V[elemc.vertex(0)],V[elemc.vertex(1)],V[elemc.vertex(2)], V[elemc.vertex(3)]]
+                        id += 1
+        print(f"Done ! Took {toc()}")
+        if CGAL_Mesh_3_IO_Util.Elem.TRIANGLES in elems:
+            print(f"Extracted {self.points.shape[0]} points and {self.triangles.shape[0]} triangles")
+        if CGAL_Mesh_3_IO_Util.Elem.TETRA in elems:
+            print(f"Extracted {self.points.shape[0]} points and {self.tetras.shape[0]} tetras")
+
+            
 
     def write_out(self, filename):
-        pass
+        path = Path(filename)
+        ext = path.suffix.lower()
+        if ext != ".vtk" and ext != ".vtu":
+            print("Only vtk or vtu extension are suported")
+            return
+
+        print(f"Saving into {filename}...")
+        tic()
+
+
+        ugrid = vtk.vtkUnstructuredGrid()
+        
+        vtk_points = vtk.vtkPoints()
+        vtk_points.SetData(numpy_support.numpy_to_vtk(self.points, deep=True))
+        ugrid.SetPoints(vtk_points)
+
+
+        if "triangles" in self.__dict__:
+            for triangle in self.triangles:
+                vtkTriangleObj = vtk.vtkTriangle()
+                vtkTriangleObj.GetPointIds().SetId(0,triangle[0])
+                vtkTriangleObj.GetPointIds().SetId(1,triangle[1])
+                vtkTriangleObj.GetPointIds().SetId(2,triangle[2])
+                ugrid.InsertNextCell(vtkTriangleObj.GetCellType(), vtkTriangleObj.GetPointIds())
+        if "tetras"  in self.__dict__:
+            for tetra in self.tetras:
+                vtkTetraObj = vtk.vtkTetra()
+                vtkTetraObj.GetPointIds().SetId(0,tetra[0])
+                vtkTetraObj.GetPointIds().SetId(1,tetra[1])
+                vtkTetraObj.GetPointIds().SetId(2,tetra[2])
+                vtkTetraObj.GetPointIds().SetId(3,tetra[3])
+                ugrid.InsertNextCell(vtkTetraObj.GetCellType(), vtkTetraObj.GetPointIds())
+
+        writer = vtk.vtkUnstructuredGridWriter()
+        writer.SetFileVersion(42)
+        writer.SetInputData(ugrid)
+        writer.SetFileName(filename)
+        writer.Write()
+        print(f"Done ! Took {toc()}")
+
+
 
 
 
