@@ -44,7 +44,24 @@ class CGAL_Mesh_from_pointcloud(CGAL_Mesh_from):
 
     def write_out(self, filename):
         self.IOUtil.write_out(filename)
-        
+
+def generatePointCloud(nbPts):
+    random.seed(time.time_ns())
+
+    PC = []
+    for i in range(int(nbPts)):
+        PC.append([random.random() * 5, random.random() * 2.5, random.random() * 2.5])
+
+    return PC
+
+
+def createScene(root):
+
+    loader = root.addObject("MeshVTKLoader", filename='data/mesh/pointCloudMesh.vtk', bbox=[-5, -5, -5, 5, 5, 5])
+    root.addObject("MeshTopology", src=loader.linkpath, bbox=[-5, -5, -5, 5, 5, 5], drawTetrahedra='True')
+
+    return root
+
 
 if __name__ == "__main__":    
 
@@ -55,11 +72,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args() 
 
-    random.seed(time.time_ns())
-
-    PC = []
-    for i in range(int(args.nbPoints)):
-        PC.append([random.random() * 2, random.random() * 1, random.random() * 1])
+    PC = generatePointCloud(args.nbPoints)
 
     tic(1)
     cmfp = CGAL_Mesh_from_pointcloud(PC)
