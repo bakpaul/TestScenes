@@ -164,12 +164,18 @@ class CGAL_Mesh_3_IO_Util(object):
         if ext != ".vtk" and ext != ".vtu":
             print("Only vtk or vtu extension are suported")
             return
+        
+        if (not "tetras"  in self.__dict__) and ext == ".vtu":
+            print("VTU only supported for tetrahedral meshes. Use vtk instead")
+            return
 
         print(f"Saving into {filename}...")
         tic()
 
-
-        ugrid = vtk.vtkUnstructuredGrid()
+        if "tetras"  in self.__dict__:
+            ugrid = vtk.vtkUnstructuredGrid()
+        else:
+            ugrid = vtk.vtkPolyData()
         
         vtk_points = vtk.vtkPoints()
         vtk_points.SetData(numpy_support.numpy_to_vtk(self.points, deep=True))
@@ -191,8 +197,12 @@ class CGAL_Mesh_3_IO_Util(object):
                 vtkTetraObj.GetPointIds().SetId(2,tetra[2])
                 vtkTetraObj.GetPointIds().SetId(3,tetra[3])
                 ugrid.InsertNextCell(vtkTetraObj.GetCellType(), vtkTetraObj.GetPointIds())
-
-        writer = vtk.vtkUnstructuredGridWriter()
+        
+        
+        if "tetras"  in self.__dict__:
+            writer = vtk.vtkUnstructuredGridWriter()
+        else:
+            writer = vtk.vtkPolyDataWriter()
         writer.SetFileVersion(42)
         writer.SetInputData(ugrid)
         writer.SetFileName(filename)
