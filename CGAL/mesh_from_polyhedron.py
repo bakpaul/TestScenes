@@ -81,13 +81,51 @@ if __name__ == "__main__":
 
     parser.add_argument("-i", "--input", default='data/mesh/torus.obj', help="The input file containing the surface. Format must be taken form ['.g', '.obj', '.stl', '.ply', '.vtk', '.vtp']") 
     parser.add_argument( "-o", "--output", default='data/mesh/torusVol.vtk', help="The output file to save the computed volumetric mesh")  
+    parser.add_argument( "-r", "--refiner", default='None', help="Use refiner to erfine the mesh. Values are amongst ['None', 'Lloyd', 'Odt', 'Perturb']")  
+    parser.add_argument( "-c", "--criteria", default='"facet_angle=25 edge_size=0.4 facet_size=0.15 facet_distance=0.008 cell_radius_edge_ration=3"', help="Set of parameters in the form of \"facet_angle=25 edge_size=0.4 facet_size=0.15 facet_distance=0.008 cell_radius_edge_ration=3\" that can be customized. If one is not specified, its default value is used")  
     args = parser.parse_args() 
-    
+
     tic(1)
     cmfp = CGAL_Mesh_from_polyhedron(filename=args.input)
+
+    #Criterial
+    class criteriaContainer:
+        def __init__(self):
+            self.facet_angle=25
+            self.edge_size=0.15
+            self.facet_size=0.15
+            self.facet_distance=0.008
+            self.cell_radius_edge_ratio=3
+
+    selectedCriterias = criteriaContainer()
+
+    for passedCriteria in args.criteria.split(' '):
+        if len(passedCriteria.split('=')) >1:
+            if passedCriteria.split('=')[0] in selectedCriterias.__dict__:
+                setattr(selectedCriterias, passedCriteria.split('=')[0], float(passedCriteria.split('=')[1]) ) 
+
     criteria = Default_mesh_criteria()
-    criteria.facet_angle(25).facet_size(0.15).facet_distance(0.008).cell_radius_edge_ratio(3)
-    cmfp.generate(criteria)
+    criteria.facet_angle(selectedCriterias.facet_angle).edge_size(selectedCriterias.edge_size).facet_size(selectedCriterias.facet_size).facet_distance(selectedCriterias.facet_distance).cell_radius_edge_ratio(selectedCriterias.cell_radius_edge_ratio)
+    
+    #Refiner
+    match args.refiner:
+        case 'Lloyd':
+            refinerName = 'Lloyd'
+            refiner =  CGAL_Mesh_from.Refiner_input(refiner_type=CGAL_Mesh_from.Refiner.LLOYD)
+        case 'Odt':
+            refinerName = 'Odt'
+            refiner =  CGAL_Mesh_from.Refiner_input(refiner_type=CGAL_Mesh_from.Refiner.ODT)
+        case 'Perturb':
+            refinerName = 'Perturb'
+            refiner =  CGAL_Mesh_from.Refiner_input(refiner_type=CGAL_Mesh_from.Refiner.PERTURB)
+        case _:
+            refinerName = 'None'
+            refiner =  CGAL_Mesh_from.Refiner_input(refiner_type=CGAL_Mesh_from.Refiner.NONE)
+
+    print(f"Launching mesh generation with following parameter : ")
+    print(f" - Criteria : facet_angle = {selectedCriterias.facet_angle}, edge_size = {selectedCriterias.edge_size}, facet_size = {selectedCriterias.facet_size}, facet_distance = {selectedCriterias.facet_distance}, cell_radius_edge_ratio = {selectedCriterias.cell_radius_edge_ratio}")
+    print(f" - Refiner : {refinerName}")
+    cmfp.generate(criteria, refiner)
 
     cmfp.write_out(args.output)
     print(f"The script took a total of {toc(1)}")
