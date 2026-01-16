@@ -5,6 +5,7 @@ from CGAL.CGAL_Mesh_3 import Default_mesh_criteria
 from CGAL.CGAL_Kernel import Point_3
 from CGAL.CGAL_Convex_hull_3 import convex_hull_3, is_strongly_convex_3
 from CGAL import CGAL_Mesh_3
+from pypcd4 import PointCloud
 
 import sys
 import argparse 
@@ -39,46 +40,71 @@ class CGAL_Mesh_from_pointcloud(CGAL_Mesh_from):
         print(f"Convex hull has {self.polyhedron.size_of_vertices()} vertices and is strongly convex: {is_strongly_convex_3(self.polyhedron)}")
 
         cmfp = CGAL_Mesh_from_polyhedron(polyhedron=self.polyhedron)
-        cmfp.generate(criteria)
+        cmfp.generate(criteria, refiner)
         self.IOUtil = cmfp.IOUtil
 
     def write_out(self, filename):
         self.IOUtil.write_out(filename)
-
-def generatePointCloud(nbPts):
-    random.seed(time.time_ns())
-
-    PC = []
-    for i in range(int(nbPts)):
-        PC.append([random.random() * 5, random.random() * 2.5, random.random() * 2.5])
-
-    return PC
-
-
-def createScene(root):
-
-    loader = root.addObject("MeshVTKLoader", filename='data/mesh/pointCloudMesh.vtk', bbox=[-5, -5, -5, 5, 5, 5])
-    root.addObject("MeshTopology", src=loader.linkpath, bbox=[-5, -5, -5, 5, 5, 5], drawTetrahedra='True')
-
-    return root
 
 
 if __name__ == "__main__":    
 
     parser = argparse.ArgumentParser(description="Creates a mesh from a point cloud using convex hull.")   
 
-    parser.add_argument("nbPoints", help="Number of random point in the point cloud") 
-    parser.add_argument( "-o", "--output", default='data/mesh/pointCloudMesh.vtk', help="The output file to save the computed volumetric mesh")  
-
+    parser.add_argument("-i", "--input", default='data/point_cloud.pcd', help="The input file containing the surface. Format must be taken form ['.pcd']")
+    parser.add_argument( "-o", "--output", default='pointCloudMesh.vtk', help="The output file to save the computed volumetric mesh")
+    parser.add_argument( "-r", "--refiner", default='None', help="Use refiner to erfine the mesh. Values are amongst ['None', 'Lloyd', 'Odt', 'Perturb']")
+    parser.add_argument( "-c", "--criteria", default='"facet_angle=25 edge_size=0.4 facet_size=0.15 facet_distance=0.008 cell_radius_edge_ration=3"', help="Set of parameters in the form of \"facet_angle=25 edge_size=0.4 facet_size=0.15 facet_distance=0.008 cell_radius_edge_ration=3\" that can be customized. If one is not specified, its default value is used")
     args = parser.parse_args() 
 
-    PC = generatePointCloud(args.nbPoints)
 
     tic(1)
-    cmfp = CGAL_Mesh_from_pointcloud(PC)
+
+    pc = PointCloud.from_path(args.input)
+    PC = pc.numpy(("x", "y", "z"))
+
+    cmfp = CGAL_Mesh_from_pointcloud(PC.tolist())
+
+
+    #Criterial
+    class criteriaContainer:
+        def __init__(self):
+            self.facet_angle=25
+            self.edge_size=0.15
+            self.facet_size=0.15
+            self.facet_distance=0.008
+            self.cell_radius_edge_ratio=3
+
+    selectedCriterias = criteriaContainer()
+
+    for passedCriteria in args.criteria.split(' '):
+        if len(passedCriteria.split('=')) >1:
+            if passedCriteria.split('=')[0] in selectedCriterias.__dict__:
+                setattr(selectedCriterias, passedCriteria.split('=')[0], float(passedCriteria.split('=')[1]) )
+
     criteria = Default_mesh_criteria()
-    criteria.facet_angle(25).facet_size(0.15).facet_distance(0.008).cell_radius_edge_ratio(3)
-    cmfp.generate(criteria)
+    criteria.facet_angle(selectedCriterias.facet_angle).edge_size(selectedCriterias.edge_size).facet_size(selectedCriterias.facet_size).facet_distance(selectedCriterias.facet_distance).cell_radius_edge_ratio(selectedCriterias.cell_radius_edge_ratio)
+
+    #Refiner
+    match args.refiner:
+        case 'Lloyd':
+            refinerName = 'Lloyd'
+            refiner =  CGAL_Mesh_from.Refiner_input(refiner_type=CGAL_Mesh_from.Refiner.LLOYD)
+        case 'Odt':
+            refinerName = 'Odt'
+            refiner =  CGAL_Mesh_from.Refiner_input(refiner_type=CGAL_Mesh_from.Refiner.ODT)
+        case 'Perturb':
+            refinerName = 'Perturb'
+            refiner =  CGAL_Mesh_from.Refiner_input(refiner_type=CGAL_Mesh_from.Refiner.PERTURB)
+        case _:
+            refinerName = 'None'
+            refiner =  CGAL_Mesh_from.Refiner_input(refiner_type=CGAL_Mesh_from.Refiner.NONE)
+
+
+    print(f"Launching mesh generation with following parameter : ")
+    print(f" - Criteria : facet_angle = {selectedCriterias.facet_angle}, edge_size = {selectedCriterias.edge_size}, facet_size = {selectedCriterias.facet_size}, facet_distance = {selectedCriterias.facet_distance}, cell_radius_edge_ratio = {selectedCriterias.cell_radius_edge_ratio}")
+    print(f" - Refiner : {refinerName}")
+    cmfp.generate(criteria, refiner)
 
     cmfp.write_out(args.output)
     print(f"The script took a total of {toc(1)}")

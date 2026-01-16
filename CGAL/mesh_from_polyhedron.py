@@ -79,8 +79,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Creates a mesh from an input file containing a polyhedron representing the surface.")   
 
-    parser.add_argument("-i", "--input", default='data/mesh/torus.obj', help="The input file containing the surface. Format must be taken form ['.g', '.obj', '.stl', '.ply', '.vtk', '.vtp']") 
-    parser.add_argument( "-o", "--output", default='data/mesh/torusVol.vtk', help="The output file to save the computed volumetric mesh")  
+    parser.add_argument("-i", "--input", default='data/torus.obj', help="The input file containing the surface. Format must be taken form ['.g', '.obj', '.stl', '.ply', '.vtk', '.vtp']")
+    parser.add_argument( "-o", "--output", default='torusVol.vtk', help="The output file to save the computed volumetric mesh")
     parser.add_argument( "-r", "--refiner", default='None', help="Use refiner to erfine the mesh. Values are amongst ['None', 'Lloyd', 'Odt', 'Perturb']")  
     parser.add_argument( "-c", "--criteria", default='"facet_angle=25 edge_size=0.4 facet_size=0.15 facet_distance=0.008 cell_radius_edge_ration=3"', help="Set of parameters in the form of \"facet_angle=25 edge_size=0.4 facet_size=0.15 facet_distance=0.008 cell_radius_edge_ration=3\" that can be customized. If one is not specified, its default value is used")  
     args = parser.parse_args() 
